@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>USYD Metacognition</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Load jsPsych and jquery-->
+  <script src="https://unpkg.com/jspsych@7.3.3"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/js/foundation.min.js'></script>
+  <link href="https://unpkg.com/jspsych@7.2.3/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <link href="https://unpkg.com/jquery-ui-css@1.11.5/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+
+
+
+  <!-- Load jsPsych plugins-->
+  <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-external-html@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-external-html@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-browser-check@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-call-function"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.2.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-html-form@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+
+  <!-- Load the global environment-->
+  <script src="global-env.js"></script>
+  <script src="info_sheets.js"></script>
+  
+
+ 
+  <!-- Some custom CSS-->
+  <link href="custom-css.css" rel="stylesheet" type="text/css" />
+
+</head>
+<body></body>
+<script>
+
+
+
+//////////////////////////////////
+//         Gloabl Settings      //
+//////////////////////////////////
+
+// Initalise jsPsych
+  const jsPsych = initJsPsych({
+ on_finish: function(data) {
+
+    if(jsPsych.data.get().filter({trial_type: "Summary Trial"}).select('correct').mean() < 0.55){window.location = attention_redirect_link} else {window.location = redirect_link}
+    //jsPsych.data.get().localSave('csv','mydata.csv');
+   }
+})
+
+
+// Settings (set these)
+
+  const DataPipe_ID = "Jgmkykdd3DSZ" // The DataPipe ID for where the data should be stored
+
+  const sona_experiment_id = "NA"; // The SONA experiment ID 
+  const sona_credit_token = "NA"; // The SONA credit token 
+  const Prolific_redirect = "CHGWKNI0"; // The Prolific redirect link (to credit)
+  const Prolific_failed_check = "C13PIUOF"; // The Prolific redirect link to NOT credit (manual review)
+  
+
+
+// Global parameters (might need to change)
+  var trialnum = 1;
+  var blocknum = 1;
+
+
+
+
+//////////////////////////////////
+
+
+
+
+
+ 
+
+
+
+
+// Instructions
+
+
+
+  var instructions = {
+    type: jsPsychInstructions,
+    pages: function(){
+      if(ratings_on == true) return [
+        '<p class="instructions">Welcome to the task!</p>' +
+        '<p class="instructions">In this test, you will be presented with a few brief details about an emotional situation, and asked to choose from four responses the most effective course of action to manage both the emotions the person is feeling and the problems they face in that situation. </p>' +
+        '<p class="instructions">Although more than one course of action might be acceptable, you are asked to choose what you think the most effective response for that person in that situation would be. </p>' +
+        '<p class="instructions">Remember, you are not necessarily choosing what you would do, or the nicest thing to do, but choosing the most effective response for that situation. </p>' +
+        '<p class="instructions">Please respond quickly and to the best of your ability.</p>',
+        '<p class="instructions">After each item, you will then rate your confidence in your judgement on a scale with the mouse.</p>' +
+        '<p class="instructions">Please do your best to rate your confidence accurately and do take advantage of the whole rating scale.</p>'
+
+        ]
+       if(ratings_on == false) return [
+        '<p class="instructions">Welcome to the task!</p>' +
+        '<p class="instructions">In this test, you will be presented with a few brief details about an emotional situation, and asked to choose from four responses the most effective course of action to manage both the emotions the person is feeling and the problems they face in that situation. </p>' +
+        '<p class="instructions">Although more than one course of action might be acceptable, you are asked to choose what you think the most effective response for that person in that situation would be. </p>' +
+        '<p class="instructions">Remember, you are not necessarily choosing what you would do, or the nicest thing to do, but choosing the most effective response for that situation. </p>' +
+        '<p class="instructions">Please respond quickly and to the best of your ability.</p>',
+
+        ]
+     },
+     show_clickable_nav: true
+   }
+
+
+
+  var recall_inst = {
+    type: jsPsychInstructions,
+    pages:
+     [
+        '<p class="instructions">The next set of questions will test your <strong>recall on the previous items</strong></p>' +
+        '<p class="instructions">Each question will ask you to recall something about the previous scenarios that you read.</p>' +
+        '<p class="instructions">Again, please respond quickly and to the best of your ability.</p>'
+    ],
+     show_clickable_nav: true
+   }
+
+
+
+
+
+   var conf_instruc = {
+    timeline: [
+    {
+      type: jsPsychHtmlSliderResponse,
+      css_classes: ["conf_instructions"],
+      stimulus: function(){
+
+        var header = jsPsych.timelineVariable('header')
+        return '<div id = "header" style = "position: relative;">' +header + "</div><br><br>" +
+        '<div id = "Iconf1" class = "conf_ins" style = "height: 25px; width: 154px; margin-top: 2px; margin-left: 15px;"></div>' +
+        '<div id = "Iconf2" class = "conf_ins" style = "height: 25px; width: 154px; margin-top: 2px; margin-left: 169px;"></div>' +
+        '<div id = "Iconf3" class = "conf_ins" style = "height: 25px; width: 154px; margin-top: 2px;margin-left: 323px;"></div>' +
+        '<div id = "Iconf4" class = "conf_ins" style = "height: 25px; width: 154px; margin-top: 2px;margin-left: 477px;"></div>' +
+        '<div id = "Iconf5" class = "conf_ins" style = "height: 25px; width: 154px; margin-top: 2px;margin-left: 631px;"></div>'
+      },
+      on_load: function(){
+
+        var w = window.innerWidth;
+        var marLeft = (w-800)/2;
+        document.getElementById("Iconf1").style.left = marLeft + "px";
+        document.getElementById("Iconf2").style.left = marLeft  + "px";
+        document.getElementById("Iconf3").style.left = marLeft  + "px";
+        document.getElementById("Iconf4").style.left = marLeft  + "px";
+        document.getElementById("Iconf5").style.left = marLeft  + "px";
+
+        var elementx = document.getElementById("jspsych-html-slider-response-response");
+        elementx.disabled = jsPsych.timelineVariable('disable');
+
+
+      },
+      min: 1,
+      max: 6,
+      step: 1,
+      slider_start: jsPsych.timelineVariable('start'),
+      slider_width: 800,
+      labels: ['Guessing', "", "", "", "", "Certain"],
+      button_label: "Submit",
+      require_movement: jsPsych.timelineVariable('require')
+    }
+
+    ],
+    timeline_variables: [
+      {start: 3, require: true, disable: false, header: 'A rating scale as shown below is used throughout the task. You will be able to rate your confidence of your judgements by choosing any point along the rating scale with your mouse. <br></br>Choose any point on the rating scale and click &apos;Submit&apos; to continue.'},
+      {start: 6, require: false, disable: true, header: 'During the task, if you are <strong>very sure</strong> that you made the correct judgement, you should respond <strong>&apos;Certain&apos;</strong>'},
+      {start: 1, require: false, disable: true, header: '<p class="instructions">If you are <strong>very unsure</strong> you made the correct judgement, you should respond <strong>&apos;Guessing&apos;</strong></p>'},
+      {start: 4, require: true, disable: false, header: '<p class="instructions">If you are <strong>somewhat sure</strong> about being correct, you should select a rating between the two descriptions.</p>' +
+      '<p class="instructions">If you understand how to use and take advantage of the whole rating scale, choose any point on the rating scale and click &apos;Submit&apos; to continue.</p>'}
+
+      ],
+    conditional_function: function(){
+     if(ratings_on === true){
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+}
+
+
+
+/////////////// **********   TRIAL  ***************************** ///////////////
+
+
+
+
+question_prompts = [
+
+  {item: "STEM01", question_text: "Wai-Hin and Connie have shared an office for years but Wai-Hin gets a new job and Connie loses contact with her. What action would be the most effective for Connie?", situation: "Wai-Hin and Connie have shared an office for years but Wai-Hin gets a new job and Connie loses contact with her.", answers_text: ["(a) Just accept that she is gone and the friendship is over.", "(b) Ring Wai-Hin and ask her out for lunch or coffee to catch up.", "(c) Contact Wai-Hin and arrange to catch up but also make friends with her replacement.", "(d) Spend time getting to know the other people in the office, and strike up new friendships."]},
+  {item: "STEM02", question_text: "Manual is only a few years from retirement when he finds out his position will no longer exist, although he will still have a job with a less prestigious role. What action would be the most effective for Manual?", situation: "Manual is only a few years from retirement when he finds out his position will no longer exist, although he will still have a job with a less prestigious role.",answers_text: ["(a) Carefully consider his options and discuss it with his family.", "(b) Talk to his boss or the management about it.", "(c) Accept the situation, but still feel bitter about it.", "(d) Walk out of that job."]},
+  {item: "STEM03", question_text: "Surbhi starts a new job where he doesn&#39;t know anyone and finds that no one is particularly friendly. What action would be the most effective for Surbhi?", situation: "Surbhi starts a new job where he doesn&#39;t know anyone and finds that no one is particularly friendly.", answers_text: ["(a) Have fun with his friends outside of work hours.", "(b) Concentrate on doing his work well at the new job.", "(c) Make an effort to talk to people and be friendly himself.", "(d) Leave the job and find one with a better environment."]},
+  {item: "STEM04", question_text: "Andre moves away from the city his friends and family are in. He finds his friends make less effort to keep in contact than he thought they would. What action would be the most effective for Andre?", situation: "Andre moves away from the city his friends and family are in. He finds his friends make less effort to keep in contact than he thought they would.", answers_text: ["(a) Try to adjust to life in the new city by joining clubs and activities there.", "(b) He should make the effort to contact them, but also try to meet people in his new city.", "(c) Let go of his old friends, who have shown themselves to be unreliable.", "(d) Tell his friends he is disappointed in them for not contacting him."]},
+  {item: "STEM05", question_text: "Clayton has been overseas for a long time and returns to visit his family. So much has changed that Clayton feels left out. What action would be the most effective for Clayton?", situation: "Clayton has been overseas for a long time and returns to visit his family. So much has changed that Clayton feels left out.", answers_text: ["(a) Nothing - it will sort itself out soon enough.", "(b) Tell his family he feels left out.", "(c) Spend time listening and getting involved again.", "(d) Reflect that relationships can change with time."]},
+  {item: "STEM06", question_text: "Daniel has been accepted for a prestigious position in a different country from his family, who he is close to. He and his wife decide it is worth relocating. What action would be the most effective for Daniel?", situation: "Daniel has been accepted for a prestigious position in a different country from his family, who he is close to. He and his wife decide it is worth relocating.", answers_text: ["(a) Realize he shouldn&#39;t have applied for the job if he didn&#39;t want to leave.", "(b) Set up a system for staying in touch, like weekly phone calls or emails.", "(c) Think about the great opportunities this change offers.", "(d) Don&#39;t take the position."]},
+  {item: "STEM07", question_text: "Mei Ling answers the phone and hears that close relatives are in hospital critically ill. What action would be the most effective for Mei Ling?", situation: "Mei Ling answers the phone and hears that close relatives are in hospital critically ill.", answers_text: ["(a) Let herself cry and express emotion for as long as she feels like.", "(b) Speak to other family to calm herself and find out what is happening, then visit the hospital.", "(c) There is nothing she can do.", "(d) Visit the hospital and ask staff about their condition."]},
+  {item: "STEM08", question_text: "Shona has not spoken to her nephew for months, whereas when he was younger they were very close. She rings him but he can only talk for five minutes. What action would be the most effective for Shona?", situation: "Shona has not spoken to her nephew for months, whereas when he was younger they were very close. She rings him but he can only talk for five minutes.", answers_text: ["(a) Realize that he is growing up and might not want to spend so much time with his family any more.", "(b) Make plans to drop by and visit him in person and have a good chat.", "(c) Understand that relationships change, but keep calling him from time to time.", "(d) Be upset about it, but realize there is nothing she can do."]},
+  {item: "STEM09", question_text: "Mina and her sister-in-law normally get along quite well, and the sister-in-law regularly baby-sits for her for a small fee. Lately she has also been cleaning away cobwebs, commenting on the mess, which Mina finds insulting. What action would be the most effective for Mina?", situation: "Mina and her sister-in-law normally get along quite well, and the sister-in-law regularly baby-sits for her for a small fee. Lately she has also been cleaning away cobwebs, commenting on the mess, which Mina finds insulting.", answers_text: ["(a) Tell her sister-in-law these comments upset her.", "(b) Get a new babysitter.", "(c) Be grateful her house is being cleaned for free.", "(d) Tell her only to baby-sit, not to clean."]},
+    {item: "attention_check", question_text: "Please select option c for this item to show you are paying attention", situation: "Please select option c for this item to show you are paying attention", answers_text: ["(a) Tell them not to cry.", "(b) Tell them to put on a brave face.", "(c) Help them focus on other things.", "(d) suggest something else for them to do"]},
+  {item: "STEM10", question_text: "Juno is fairly sure his company is going down and his job is under threat. It is a large company and nothing official has been said. What action would be the most effective for Juno?", situation: "Juno is fairly sure his company is going down and his job is under threat. It is a large company and nothing official has been said.", answers_text: ["(a) Find out what is happening and discusshis concerns with his family.", "(b) Try to keep the company afloat by working harder.", "(c) Start applying for other jobs.", "(d) Think of these events as an opportunity for a new start."]},
+  {item: "STEM11", question_text: "Mallory moves from a small company to a very large one, where there is little personal contact, which she misses. What action would be the most effective for Mallory?", situation: "Mallory moves from a small company to a very large one, where there is little personal contact, which she misses.", answers_text: ["(a) Talk to her workmates, try to create social contacts and make friends.", "(b) Start looking for a new job so she can leave that environment.", "(c) Just give it time, and things will be okay.", "(d) Concentrate on her outside-work friends and colleagues from previous jobs."]},
+  {item: "STEM12", question_text: "A demanding client takes up a lot of Jill&#39;s time and then asks to speak to Jill&#39;s boss about her performance. Although Jill&#39;s boss assures her that her performance is fine, Jill feels upset. What action would be the most effective for Jill?", situation: "A demanding client takes up a lot of Jill&#39;s time and then asks to speak to Jill&#39;s boss about her performance. Although Jill&#39;s boss assures her that her performance is fine, Jill feels upset.", answers_text: ["(a) Talk to her friends or workmates about it.", "(b) Ignore the incident and move on to her next task.", "(c) Calm down by taking deep breaths or going for a short walk.", "(d) Think that she has been successful in the past and this client being difficult is not her fault."]},
+  {item: "STEM13", question_text: "Blair and Flynn usually go to a cafe after the working week and chat about what&#39;s going on in the company. After Blair&#39;s job is moved to a different section in the company, he stops coming to the cafe. Flynn misses these Friday talks. What action would be the most effective for Flynn?", situation: "Blair and Flynn usually go to a cafe after the working week and chat about what&#39;s going on in the company. After Blair&#39;s job is moved to a different section in the company, he stops coming to the cafe. Flynn misses these Friday talks. ", answers_text: ["(a) Go to the cafe orsocialize with other workers.", "(b) Don&#39;t worry about it, ignore the changes and let Blair be.", "(c) Not talk to Blair again.", "(d) Invite Blair again, maybe rescheduling for another time.",]},
+  {item: "STEM14", question_text: "Michelle&#39;s friend Dara is moving overseas to live with her partner. They have been good friends for many years and Dara is unlikely to come back. What action would be the most effective for Michelle?", situation: "Michelle&#39;s friend Dara is moving overseas to live with her partner. They have been good friends for many years and Dara is unlikely to come back.", answers_text: ["(a) Forget about Dara.", "(b) Spend time with other friends,keeping herself busy.", "(c) Think that Dara and her partner will return soon.", "(d) Make sure she keeps in contact through email, phone or letter writing.",]},
+  {item: "STEM15", question_text: "Hannah&#39;s access to essential resources has been delayed and her work is way behind schedule. Her progress report makes no mention of the lack of resources. What action would be the most effective for Hannah?", situation: "Hannah&#39;s access to essential resources has been delayed and her work is way behind schedule. Her progress report makes no mention of the lack of resources.", answers_text: ["(a) Explain the lack of resources to her boss or to management.", "(b) Learn that she should plan ahead for next time.", "(c) Document the lack of resources in her progress report.", "(d) Don&#39;t worry about it.",]},
+  {item: "STEM16", question_text: "Reece&#39;s friend points out that her young children seem to be developing more quickly than Reece&#39;s. Reece sees that this is true. What action would be the most effective for Reece?", situation: "Reece&#39;s friend points out that her young children seem to be developing more quickly than Reece&#39;s. Reece sees that this is true.", answers_text: ["(a) Talk the issue over with another friend.", "(b) Angrily confront her friend about making such statements.", "(c) Realize that children develop at different rates.", "(d) Talk to a doctor about what the normal rates of development are."]},
+  {item: "STEM17", question_text: "Jumah has been working at a new job part-time while he studies. His shift times for the week are changed at the last minute, without consulting him. What action would be the most effective for Jumah?", situation: "Jumah has been working at a new job part-time while he studies. His shift times for the week are changed at the last minute, without consulting him.", answers_text: ["(a) Refuse to work the new shifts.", "(b) Find out if there is some reasonable explanation for the shift changes.", "(c) Tell the manager in charge of shifts that he is not happy about it.", "(d) Grumpily accept the changes and do the shifts."]},
+  {item: "STEM18", question_text: "Julie hasn&#39;t seen Ka for ages and looks forward to their weekend trip away. However, Ka has changed a lot and Julie finds that she is no longer an interesting companion. What action would be the most effective for Julie?", situation: "Julie hasn&#39;t seen Ka for ages and looks forward to their weekend trip away. However, Ka has changed a lot and Julie finds that she is no longer an interesting companion.", answers_text: ["(a) Cancel the trip and go home.", "(b) Realize that it is time to give up the friendship and move on.", "(c) Understand that people change, so move on, but remember the good times.", "(d) Concentrate on her other, more rewarding friendships."]}
+  ]
+
+
+
+recall_prompts = [
+  {
+    question_text: "Wai-Hin and Connie shared an office, then something happened. What was it?",
+    option_1: "(a) They had a fight",
+    option_2: "(b) Connie got promoted and stopped talking to Wai-Hin",
+    option_3: "(c) Wai-Hin got a new job",
+    option_4: "(d) Wai-Hin made new friends",
+    answer: "2"
+  },
+  {
+    question_text: "Manual found out his position no longer exists, although he will still have a job with a less prestigious role. When did this happen?",
+    option_1: "(a) Just as he was starting at a new company",
+    option_2: "(b) When a new boss came in and made changes",
+    option_3: "(c) When he was a few years from retirement",
+    option_4: "(d) Right after he bought a new house",
+    answer: "2"
+  },
+  {
+    question_text: "Surbhi started a new job. What problem did he face?",
+    option_1: "(a) No one was particularly friendly",
+    option_2: "(b) He didn&apos;t get along with his new boss",
+    option_3: "(c) The position wasn&apos;t what he was expecting",
+    option_4: "(d) He found the work boring ",
+    answer: "0"
+  },
+  {
+    question_text: "Andre moved away from the city his friends and family are in. What did his friends do?",
+    option_1: "(a) Kept trying to call him while he was busy",
+    option_2: "(b) Wrote him long emails about their lives",
+    option_3: "(c) Rarely visited",
+    option_4: "(d) Did not keep in contact very much",
+    answer: "3"
+  },
+  {
+    question_text: "Clayton visited his family. What happened?",
+    option_1: "(a) He felt left out",
+    option_2: "(b) He fought with them",
+    option_3: "(c) There was too much happening, and he was overwhelmed",
+    option_4: "(d) They seemed preoccupied with their own lives",
+    answer: "0"
+  },
+  {
+    question_text: "Daniel was accepted for a prestigious position. What issue did he face?",
+    option_1: "(a) he had already accepted a position elsewhere",
+    option_2: "(b) He was nervous about quitting his current position",
+    option_3: "(c) The position was in a different country",
+    option_4: "(d) The position didn&apos;t pay very well",
+    answer: "2"
+  },
+  {
+    question_text: "Mei Ling got some bad news on the phone. What was it?",
+    option_1: "(a) She lost her job",
+    option_2: "(b) Close relatives are in hospital",
+    option_3: "(c) Her friend had died",
+    option_4: "(d) Her insurance claim was denied",
+    answer: "1"
+  },
+  {
+    question_text: "Shona has not spoken to her nephew for months. She rings him, what happens?",
+    option_1: "(a) He can only talk for 5 minutes",
+    option_2: "(b) He doesn&apos;t pick up",
+    option_3: "(c) He lets it go to voicemail",
+    option_4: "(d) He semes disinterested when they talk",
+    answer: "0"
+  },
+  {
+    question_text: "Mina&apos;s sister-in-law normally comments on the mess in her home while she is:",
+    option_1: "(a) Staying with Mina",
+    option_2: "(b) Helping Mina redecorate",
+    option_3: "(c) Watching a movie at Mina&apos;s house",
+    option_4: "(d) Baby-siting for Mina",
+    answer: "3"
+  },
+  {
+    question_text: "Juno&apos;s job is under threat. What kind of company is he working at?",
+    option_1: "(a) A technology company",
+    option_2: "(b) A small company",
+    option_3: "(c) A medium company",
+    option_4: "(d) A large company",
+    answer: "3"
+  },
+  {
+    question_text: "Mallory moves from a small company to a very large one. What does she miss about her old company?",
+    option_1: "(a) Her colleagues",
+    option_2: "(b) Her boss",
+    option_3: "(c) The personal contact",
+    option_4: "(d) The responsibility she had",
+    answer: "2"
+  },
+  {
+    question_text: "Jill had to assure her boss that her performance is fine. Why?",
+    option_1: "(a) Her colleagues noticed her work was slipping",
+    option_2: "(b) She made a mistake on a report",
+    option_3: "(c) A client complained to her boss",
+    option_4: "(d) A colleague complained about her to her boss",
+    answer: "2"
+  },
+  {
+    question_text: "Blair and Flynn usually catch up after the working week and chat about what&apos;s going on in the company. Where do they meet?",
+    option_1: "(a) An office meeting room",
+    option_2: "(b) A cafe",
+    option_3: "(c) A bar",
+    option_4: "(d) Over the phone",
+    answer: "1"
+  },
+  {
+    question_text: "Michelle&apos;s friend Dara is moving overseas. Why was Dara moving?",
+    option_1: "(a) To live with her partner",
+    option_2: "(b) For a new job",
+    option_3: "(c) For an adventure",
+    option_4: "(d) To live closer to her family",
+    answer: "0"
+  },
+  {
+    question_text: "Hannah&apos;s work is way behind schedule. Why?",
+    option_1: "(a) Her boss was interfering",
+    option_2: "(b) Her access to resources was delayed",
+    option_3: "(c) Her colleagues weren&apos;t pulling their weight",
+    option_4: "(d) She was on vacation",
+    answer: "1"
+  },
+  {
+    question_text: "Reece&apos;s friend points out that her young children seem to be developing more quickly than Reece&apos;s. What did Reece think?",
+    option_1: "(a) She was worried about her children",
+    option_2: "(b) That children develop at different rates",
+    option_3: "(c) That her friend was criticizing her parenting",
+    option_4: "(d) That her friend&apos;s claim was untrue",
+    answer: "3"
+  },
+  {
+    question_text: "Jumah has been working at a new job part-time while he studies. What keeps happening?",
+    option_1: "(a) Customers are rude to him",
+    option_2: "(b) His shifts keep changing",
+    option_3: "(c) His boss embarrasses him in front of his colleagues",
+    option_4: "(d) he hasn&apos;t been paid correctly",
+    answer: "1"
+  },
+  {
+    question_text: "Julie hasn&apos;t seen Ka for ages. They re-connect; however, Ka has changed a lot. Where did they re-connect?",
+    option_1: "(a) When they bumped into each other",
+    option_2: "(b) At a friend&apos;s wedding",
+    option_3: "(c) Over a coffee",
+    option_4: "(d) On a weekend away",
+    answer: "3"
+  }
+]
+
+
+
+var STEM_trial = {
+  data: function(){
+    return {trialnum: trialnum, blocknum: blocknum, phase: "STEM"}
+  },
+  timeline: [
+
+
+// Question
+
+  {type: jsPsychSurveyMultiChoice,
+  questions: [
+  {
+    prompt: jsPsych.timelineVariable('question_text'), 
+    name: jsPsych.timelineVariable('item'), 
+    options:  jsPsych.timelineVariable('answers_text'), 
+    required: true
+  }
+  ],
+  on_finish: function(data) {
+
+    data.trial_type = "Stimulus Response";
+    data.item = jsPsych.timelineVariable('item');
+
+
+// Pull out selection
+
+
+
+const keys = Object.keys(data.response);
+const firstKey = keys[0];
+const firstValue = data.response[firstKey];
+
+
+
+
+if(jsPsych.timelineVariable('answers_text')[0] == firstValue) {data.selection = 0}
+if(jsPsych.timelineVariable('answers_text')[1] == firstValue) {data.selection = 1}
+if(jsPsych.timelineVariable('answers_text')[2] == firstValue) {data.selection = 2}
+if(jsPsych.timelineVariable('answers_text')[3] == firstValue) {data.selection = 3}
+
+
+
+// Scoring
+
+    data.correct = 0;
+
+if(jsPsych.timelineVariable('item') == "STEM01" & data.selection+ 1 == 1) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM01" & data.selection+ 1 == 2) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM01" & data.selection+ 1 == 3) {data.correct =  0.916666667}
+if(jsPsych.timelineVariable('item') == "STEM01" & data.selection+ 1 == 4) {data.correct =  0.083333333}
+if(jsPsych.timelineVariable('item') == "STEM02" & data.selection+ 1 == 1) {data.correct =  0.75}
+if(jsPsych.timelineVariable('item') == "STEM02" & data.selection+ 1 == 2) {data.correct =  0.25}
+if(jsPsych.timelineVariable('item') == "STEM02" & data.selection+ 1 == 3) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM02" & data.selection+ 1 == 4) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM03" & data.selection+ 1 == 1) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM03" & data.selection+ 1 == 2) {data.correct =  0.166666667}
+if(jsPsych.timelineVariable('item') == "STEM03" & data.selection+ 1 == 3) {data.correct =  0.833333333}
+if(jsPsych.timelineVariable('item') == "STEM03" & data.selection+ 1 == 4) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM04" & data.selection+ 1 == 1) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM04" & data.selection+ 1 == 2) {data.correct =  1}
+if(jsPsych.timelineVariable('item') == "STEM04" & data.selection+ 1 == 3) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM04" & data.selection+ 1 == 4) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM05" & data.selection+ 1 == 1) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM05" & data.selection+ 1 == 2) {data.correct =  0.166666667}
+if(jsPsych.timelineVariable('item') == "STEM05" & data.selection+ 1 == 3) {data.correct =  0.75}
+if(jsPsych.timelineVariable('item') == "STEM05" & data.selection+ 1 == 4) {data.correct =  0.083333333}
+if(jsPsych.timelineVariable('item') == "STEM06" & data.selection+ 1 == 1) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM06" & data.selection+ 1 == 2) {data.correct =  0.833333333}
+if(jsPsych.timelineVariable('item') == "STEM06" & data.selection+ 1 == 3) {data.correct =  0.166666667}
+if(jsPsych.timelineVariable('item') == "STEM06" & data.selection+ 1 == 4) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM07" & data.selection+ 1 == 1) {data.correct =  0.083333333}
+if(jsPsych.timelineVariable('item') == "STEM07" & data.selection+ 1 == 2) {data.correct =  0.916666667}
+if(jsPsych.timelineVariable('item') == "STEM07" & data.selection+ 1 == 3) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM07" & data.selection+ 1 == 4) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM08" & data.selection+ 1 == 1) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM08" & data.selection+ 1 == 2) {data.correct =  0.25}
+if(jsPsych.timelineVariable('item') == "STEM08" & data.selection+ 1 == 3) {data.correct =  0.75}
+if(jsPsych.timelineVariable('item') == "STEM08" & data.selection+ 1 == 4) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM09" & data.selection+ 1 == 1) {data.correct =  0.75}
+if(jsPsych.timelineVariable('item') == "STEM09" & data.selection+ 1 == 2) {data.correct =  0}
+if(jsPsych.timelineVariable('item') == "STEM09" & data.selection+ 1 == 3) {data.correct =  0.166666667}
+if(jsPsych.timelineVariable('item') == "STEM09" & data.selection+ 1 == 4) {data.correct =  0.083333333}
+
+
+if(jsPsych.timelineVariable('item') == "STEM10" & data.selection + 1 == 1){data.correct = 0.75}
+if(jsPsych.timelineVariable('item') == "STEM10" & data.selection + 1 == 2){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM10" & data.selection + 1 == 3){data.correct = 0.25}
+if(jsPsych.timelineVariable('item') == "STEM10" & data.selection + 1 == 4){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM11" & data.selection + 1 == 1){data.correct = 0.916666667}
+if(jsPsych.timelineVariable('item') == "STEM11" & data.selection + 1 == 2){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM11" & data.selection + 1 == 3){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM11" & data.selection + 1 == 4){data.correct = 0.083333333}
+if(jsPsych.timelineVariable('item') == "STEM12" & data.selection + 1 == 1){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM12" & data.selection + 1 == 2){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM12" & data.selection + 1 == 3){data.correct = 0.083333333}
+if(jsPsych.timelineVariable('item') == "STEM12" & data.selection + 1 == 4){data.correct = 0.916666667}
+if(jsPsych.timelineVariable('item') == "STEM13" & data.selection + 1 == 1){data.correct = 0.166666667}
+if(jsPsych.timelineVariable('item') == "STEM13" & data.selection + 1 == 2){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM13" & data.selection + 1 == 3){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM13" & data.selection + 1 == 4){data.correct = 0.833333333}
+if(jsPsych.timelineVariable('item') == "STEM14" & data.selection + 1 == 1){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM14" & data.selection + 1 == 2){data.correct = 0.083333333}
+if(jsPsych.timelineVariable('item') == "STEM14" & data.selection + 1 == 3){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM14" & data.selection + 1 == 4){data.correct = 0.916666667}
+if(jsPsych.timelineVariable('item') == "STEM15" & data.selection + 1 == 1){data.correct = 0.166666667}
+if(jsPsych.timelineVariable('item') == "STEM15" & data.selection + 1 == 2){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM15" & data.selection + 1 == 3){data.correct = 0.833333333}
+if(jsPsych.timelineVariable('item') == "STEM15" & data.selection + 1 == 4){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM16" & data.selection + 1 == 1){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM16" & data.selection + 1 == 2){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM16" & data.selection + 1 == 3){data.correct = 0.25}
+if(jsPsych.timelineVariable('item') == "STEM16" & data.selection + 1 == 4){data.correct = 0.75}
+if(jsPsych.timelineVariable('item') == "STEM17" & data.selection + 1 == 1){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM17" & data.selection + 1 == 2){data.correct = 0.75}
+if(jsPsych.timelineVariable('item') == "STEM17" & data.selection + 1 == 3){data.correct = 0.25}
+if(jsPsych.timelineVariable('item') == "STEM17" & data.selection + 1 == 4){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM18" & data.selection + 1 == 1){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM18" & data.selection + 1 == 2){data.correct = 0}
+if(jsPsych.timelineVariable('item') == "STEM18" & data.selection + 1 == 3){data.correct = 0.916666667}
+if(jsPsych.timelineVariable('item') == "STEM18" & data.selection + 1 == 4){data.correct = 0.083333333}
+
+
+
+
+
+
+
+
+
+  },
+},
+
+
+
+
+
+// Confidence Rating
+{
+  timeline: [
+
+  {
+    type: jsPsychHtmlSliderResponse,
+    stimulus: "<h3>Rate your confidence:</h3>" +
+    '<div id = "conf1" class = "conf" style = "height: 25px; width: 154px; margin-top: 2px; margin-left: 15px;"></div>' +
+    '<div id = "conf2" class = "conf" style = "height: 25px; width: 154px; margin-top: 2px;margin-left: 169px;"></div>' +
+    '<div id = "conf3" class = "conf" style = "height: 25px; width: 154px; margin-top: 2px;margin-left: 323px;"></div>' +
+    '<div id = "conf4" class = "conf" style = "height: 25px; width: 154px; margin-top: 2px;margin-left: 477px;"></div>' +
+    '<div id = "conf5" class = "conf" style = "height: 25px; width: 154px; margin-top: 2px;margin-left: 631px;"></div>',
+    min: 1,
+    max: 6,
+    step: 1,
+    slider_width: 800,
+    require_movement: true,
+    labels: ['Guessing', "", "", "", "", "Certain"],
+    button_label: "Submit",
+    on_finish: function(data){
+      data.trial_type = "Confidence Rating";
+
+    },
+    css_classes: ["conf_rating"]
+
+  }
+
+  ],
+  conditional_function: function(){
+    if(ratings_on === false){
+      return false;
+    } else {
+      return true;
+    }
+  }
+},
+
+
+// Summary trial to store all the data typically required (nothing is displayed to the particpant) and do the staircasing
+{
+  type: jsPsychCallFunction,
+  func: function(data){
+
+
+  },
+  on_finish: function(data){
+
+    data.rt = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last().values()[0].rt;
+    data.response = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last().values()[0].response;
+    data.correct = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last().values()[0].correct;
+
+    if(ratings_on == true){
+      data.confidence = jsPsych.data.get().filter({trial_type: "Confidence Rating"}).last().values()[0].response;
+    } else {
+      data.confidence = "NA";
+    }
+
+    data.trial_type = "Summary Trial"
+    trialnum++;
+
+  }
+},
+],
+  timeline_variables: question_prompts
+};
+
+
+
+
+
+
+
+
+
+
+var recall_trial = {
+  data: function(){
+    return {trialnum: trialnum, blocknum: blocknum, phase: "Recall"}
+  },
+  timeline: [
+
+
+// Question
+
+  {type: jsPsychSurveyMultiChoice,
+  questions: [
+  {
+    prompt: jsPsych.timelineVariable('question_text'), 
+    name: "RECALL_" + trialnum, 
+    options:  [jsPsych.timelineVariable('option_1'), jsPsych.timelineVariable('option_2'), jsPsych.timelineVariable('option_3'), jsPsych.timelineVariable('option_4')], 
+    required: true
+  }
+  ],
+  on_finish: function(data) {
+
+
+    // Store Selection
+const keys = Object.keys(data.response);
+const firstKey = keys[0];
+const firstValue = data.response[firstKey];
+
+
+
+
+if(jsPsych.timelineVariable('option_1') == firstValue) {data.selection = 0}
+if(jsPsych.timelineVariable('option_2') == firstValue) {data.selection = 1}
+if(jsPsych.timelineVariable('option_3') == firstValue) {data.selection = 2}
+if(jsPsych.timelineVariable('option_4') == firstValue) {data.selection = 3}
+
+
+
+    // Score
+
+
+    if(data.selection == jsPsych.timelineVariable('answer')){data.correct = 1} else (data.correct = 0);
+    data.trial_type = "Summary Trial";
+    trialnum++;
+
+  
+  },
+}
+],
+  timeline_variables: recall_prompts
+};
+
+
+
+
+
+
+
+
+var debug = {
+  type: jsPsychSurveyText,
+  questions: [
+    {prompt: 'Did you experience any issues while completing this study?', rows: 5}
+    ]
+}
+
+
+
+  // Blocks
+
+
+const test_block = {
+  data: {phase: "Test"},
+  timeline: [STEM_trial],
+  on_timeline_start: function(){
+    provide_feedback = false; 
+  }
+}
+
+const recall_block = {
+  data: {phase: "Recall"},
+  timeline: [recall_trial],
+}
+
+
+
+
+
+
+
+// Save data and redirect [shouldn't need to edit below]
+
+
+
+
+
+// Capture any url paramaters
+const PROLIFIC_PID = jsPsych.data.getURLVariable('PROLIFIC_PID');
+const SONA_PID = jsPsych.data.getURLVariable('SONAID');
+
+
+// Redirect based on SONA vs Prolific
+
+    // SONA
+if(typeof SONA_PID != 'undefined'){
+
+  jsPsych.data.addProperties({participant_id: SONA_PID});
+  jsPsych.data.addProperties({Source: "SONA"});
+
+  redirect_link = "https://sydneypsych.sona-systems.com/webstudy_credit.aspx?experiment_id="+sona_experiment_id+"&credit_token="+sona_credit_token+"&survey_code=" + SONA_PID + "&id=" + SONA_PID;
+    attention_redirect_link = "https://sydney.au1.qualtrics.com/jfe/form/SV_3h2qh8pBAnv00QK?SONA_PID=" + SONA_PID + "accuracy=" + jsPsych.data.get().filter({trial_type: "Summary Trial"}).select('correct').mean(); // A seperate link for those who fail the attention check
+
+
+  }
+
+    // PROLIFIC
+  if(typeof SONA_PID === 'undefined'){
+
+    jsPsych.data.addProperties({participant_id: PROLIFIC_PID});
+    jsPsych.data.addProperties({Source: "Prolific"});
+
+    redirect_link ="https://app.prolific.com/submissions/complete?cc=" + Prolific_redirect;
+    attention_redirect_link ="https://app.prolific.co/submissions/complete?cc=" + Prolific_failed_check; // A seperate link for those who fail the attention check
+  }
+
+
+
+
+  // Save to OSF
+  const subject_id = jsPsych.randomization.randomID(10);
+  const filename = `${subject_id}.csv`;
+
+
+
+  const save_data = {
+    type: jsPsychPipe,
+    action: "save",
+    experiment_id: DataPipe_ID,
+    filename: filename,
+    data_string: ()=>jsPsych.data.get().csv()
+  };
+
+
+
+// Create Experiment
+
+// 
+  condition_1_timeline = [participant_info_paid, participant_info_SONA, instructions, conf_instruc, test_block, recall_inst, recall_block, debug, save_data, DEBRIEF_SONA];
+
+  async function createExperiment(){
+    const condition = await jsPsychPipe.getCondition(DataPipe_ID);
+    jsPsych.data.addProperties({condition: condition});
+
+     if(condition == 0) {  ratings_on = false; }
+     if(condition == 1) {  ratings_on = true; }
+    jsPsych.data.addProperties({ratings_on: ratings_on});
+
+
+    if(condition == 0) { timeline = condition_1_timeline; }
+    if(condition == 1) { timeline = condition_1_timeline; }
+    jsPsych.run(timeline);
+  }
+
+
+
+
+  createExperiment();
+
+
+</script>
+</html>
