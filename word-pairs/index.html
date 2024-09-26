@@ -38,8 +38,8 @@
   
 
   <!-- Load custom plugins from directory-->
-
-
+  <script src="tetris2.js"></script>
+  <script src="stats.js"></script>
 
 
 
@@ -106,11 +106,16 @@
 
 //
 
-
-  var tetris = {
+var tetris = {
     type: jsPsychExternalHtml,
     url: "javascript-tetris-master/index.html",
     cont_btn: "start"
+};
+
+  var tetris2 = {
+    type: jsPsychTetris,
+    choices: 'NO_KEYS',
+    trial_duration: 3000
 };
 
 
