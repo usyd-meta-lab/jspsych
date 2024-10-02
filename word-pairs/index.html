@@ -72,7 +72,7 @@
 
 // Settings (set these)
 
-  const DataPipe_ID = "UzZG6mBaBIaR" // The DataPipe ID for where the data should be stored
+  const DataPipe_ID = "jf9DIF4t02Fq" // The DataPipe ID for where the data should be stored
 
   const sona_experiment_id = "NA"; // The SONA experiment ID 
   const sona_credit_token = "NA"; // The SONA credit token 
@@ -316,9 +316,9 @@
       "<p>On a scale from -100% to 100%, rate how effective you think the "+ cue_names[0] +" is compared to doing "+cue_names[1]+", if at all</p>" 
 
     },
-    labels: ['-100% - '+cue_names[0]+' IMPROVES memory compared to '+cue_names[1],
+    labels: ['-100% - '+cue_names[1]+' IMPROVES memory compared to '+cue_names[0],
       '0% - '+cue_names[0]+' has no effect on memory compared to '+cue_names[1]+'',
-      '100% - '+cue_names[1]+' IMPROVES memory compared to '+cue_names[0]],
+      '100% - '+cue_names[0]+' IMPROVES memory compared to '+cue_names[1]],
     slider_start: 0,
     min: -100,
     max: 100,
@@ -326,7 +326,7 @@
     button_label: 'Next',
     on_finish: function(data){
       data.trial_type = "Efficacy";
-      data.efficacy_pos_label = cue_names[1];
+      data.efficacy_pos_label = cue_names[0];
 
     }
 
