@@ -72,7 +72,7 @@
 
 // Settings (set these)
 
-  const DataPipe_ID = "jf9DIF4t02Fq" // The DataPipe ID for where the data should be stored
+  const DataPipe_ID = "DQCyG8R4gdth" // The DataPipe ID for where the data should be stored
 
   const sona_experiment_id = "NA"; // The SONA experiment ID 
   const sona_credit_token = "NA"; // The SONA credit token 
@@ -177,10 +177,7 @@
           '<p class="instructions">CAT : DOG' +
           '<p class="instructions">For each word pair, the first word of the pair is on the left side and the second word of the pair is on the right side of the :' +
           '<p class="instructions">Pay close attention to each word pair.' +
-          '<p class="instructions">For some word pairs, you will be asked to guess the word that completes the pair before you learn the answer e.g.' +
-          '<p class="instructions">CAT : ????' +
-          '<p class="instructions">Take a guess at which word completes the pair by entering it into the textbox. You will then see both words in the word pair.' +
-          '<p class="instructions">Once the series has finished, you will be prompted to recall the second word of each word pair, with the first word presented as prompts. Enter the second word of each word pair into the provided textbox.' +
+          '<p class="instructions">There will two blocks where you get to learn the word pairs and then a test' +
           '<p class="instructions"><b>Do not write down or record any of the word pairs, try to memorise them</b><br><br><br>' +
           '<p class="instructions">Click "Next" when you are ready to begin.' 
 
@@ -192,10 +189,7 @@
            '<p class="instructions">CAT : DOG' +
            '<p class="instructions">For each word pair, the first word of the pair is on the left side and the second word of the pair is on the right side of the :' +
            '<p class="instructions">Pay close attention to each word pair.' +
-           '<p class="instructions">For some word pairs, you will be asked to guess the word that completes the pair before you learn the answer e.g.' +
-           '<p class="instructions">CAT : ????' +
-           '<p class="instructions">Take a guess at which word completes the pair by entering it into the textbox. You will then see both words in the word pair.' +
-           '<p class="instructions">Once the series has finished, you will be prompted to recall the second word of each word pair, with the first word presented as prompts. Enter the second word of each word pair into the provided textbox.' +
+           '<p class="instructions">There will two blocks where you get to learn the word pairs and then a test' +
            '<p class="instructions"><b>Do not write down or record any of the word pairs, try to memorise them</b><br><br><br>' +
            '<p class="instructions">Click "Next" when you are ready to begin.' 
 
@@ -205,6 +199,22 @@
      }
 
 
+
+    var practice_start = {
+      type: jsPsychInstructions,
+
+      pages:  [
+        '<p class="instructions"><h2>Practice Phase</h2>' +
+        '<p class="instructions">On the second practice block, you will get to practice recalling some of the word pairs. You will be asked to guess the word that completes the pair before you learn the answer e.g.' +
+           '<p class="instructions">CAT : ????' +
+           '<p class="instructions">Take a guess (self-testing) at which word completes the pair by entering it into the textbox. You will then see both words in the word pair.' +
+           '<p class="instructions">Not all of the word pairs will reuqire you to self-test, some will be presented in full and you can just re-read them to try and memorize them.' +
+           '<p class="instructions">Once the series has finished, you will be prompted to recall the second word of each word pair, with the first word presented as prompts. Enter the second word of each word pair into the provided textbox.' +
+           '<p class="instructions"><b>Again, do not write down or record any of the word pairs, try to memorise them</b><br><br><br>'
+
+        ],
+      show_clickable_nav: true
+    }
 
 
      var test_start = {
@@ -227,7 +237,7 @@
       },
       pages: function(){
         return [
-          '<p class="instructions">You have now completed the learning phase. Before commencing the test phase, you will play Tetris for 2 minutes. Press "Next" to commence playing' 
+          '<p class="instructions">You have now completed the learning phase. Press "Next" to commence the test phase.' 
 
           ]
       },
@@ -305,14 +315,13 @@
   
 /////////////// **********  Effiacy Rating  ***************************** ///////////////
 
-  var cue_names  = jsPsych.randomization.repeat(["self-testing", "reading"], 1);
+  var cue_names  = jsPsych.randomization.repeat(["self-testing", "re-reading"], 1);
 
   var eff_rating = {
     type: jsPsychHtmlSliderResponse,
     stimulus: function(){
       return   "<h1>Self-testing vs reading</h1>" +
       "<p>We are now going to ask you to make a judgement about the study techniques that you have just used.</p> " +
-      "<p>For some of the word pairs you guessed the word on the right before it was revealed, this is called <strong>self-testing</strong>, and for other word pairs you <strong>read</strong> the complete pair without guessing (<strong>reading</strong>).</p>" +
       "<p>On a scale from -100% to 100%, rate how effective you think the "+ cue_names[0] +" is compared to doing "+cue_names[1]+", if at all</p>" 
 
     },
@@ -359,6 +368,115 @@
 
 
 /////////////// **********  Study TRIAL  ***************************** ///////////////
+
+
+
+
+  var present_trial = {
+    data: function(){
+      return {trialnum: trialnum, blocknum: blocknum}
+    },
+    timeline: [
+
+// Fixation
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: '<p id = "fixation" style = "font-size: 70px">+</p>',
+      choices: 'NO_KEYS',
+      trial_duration: 1000,
+      on_finish: function(data){
+        data.trial_type = "Fixation";
+      }
+    },
+
+
+// Presentation
+    {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function(){
+        return '<p style = "font-size: 70px">'+ jsPsych.timelineVariable('cue') + ' : ' + jsPsych.timelineVariable('target') + '</p>'
+      },
+      choices: 'NO_KEYS',
+      trial_duration: 4000/pilot_speed,
+      on_finish: function(data){
+        data.trial_type = "Presentation";
+      }
+    },
+
+
+
+
+// Summary trial to store all the data typically required (nothing is displayed to the particpant) 
+    {
+      type: jsPsychCallFunction,
+      func: function(data){
+
+      },
+      on_finish: function(data){
+
+        data.phase = "Presentation";
+        data.cue = jsPsych.timelineVariable('cue');
+        data.target = jsPsych.timelineVariable('target');
+        data.quiz_on = false;
+
+        data.trial_type = "Presentation Summary Trial"
+
+      }
+    },
+
+
+
+    ],
+timeline_variables: [
+  {cue: 'beautiful', target: 'pretty'},
+  {cue: 'exact', target: 'precise'},
+  {cue: 'adorable', target: 'cute'},
+  {cue: 'bake', target: 'cake'},
+  {cue: 'mine', target: 'yours'},
+  {cue: 'nephew', target: 'niece'},
+  {cue: 'large', target: 'small'},
+  {cue: 'eye', target: 'see'},
+  {cue: 'jumpy', target: 'nervous'},
+  {cue: 'snatch', target: 'take'},
+
+  {cue: 'slender', target: 'thin'},
+  {cue: 'embrace', target: 'hug'},
+  {cue: 'breakfast', target: 'lunch'},
+  {cue: 'cashew', target: 'nut'},
+  {cue: 'annual', target: 'yearly'},
+  {cue: 'dump', target: 'garbage'},
+  {cue: 'gull', target: 'sea'},
+  {cue: 'mule', target: 'donkey'},
+  {cue: 'chunk', target: 'piece'},
+  {cue: 'strand', target: 'hair'},
+
+  {cue: 'ape', target: 'monkey'},
+  {cue: 'cigarette', target: 'smoke'},
+  {cue: 'trot', target: 'horse'},
+  {cue: 'juice', target: 'orange'},
+  {cue: 'tile', target: 'floor'},
+  {cue: 'hog', target: 'pig'},
+  {cue: 'sprain', target: 'ankle'},
+  {cue: 'assistant', target: 'helper'},
+  {cue: 'cop', target: 'police'},
+  {cue: 'ski', target: 'snow'},
+
+  {cue: 'stench', target: 'smell'},
+  {cue: 'drain', target: 'sink'},
+  {cue: 'artery', target: 'vein'},
+  {cue: 'deep', target: 'shallow'},
+  {cue: 'calendar', target: 'date'},
+  {cue: 'lumber', target: 'wood'},
+  {cue: 'wicker', target: 'basket'},
+  {cue: 'kind', target: 'nice'},
+  {cue: 'ceiling', target: 'roof'},
+  {cue: 'brother', target: 'sister'},
+
+  ],
+randomize_order: true
+};
+
+
 
 
 
@@ -794,6 +912,15 @@ var debug = {
 
   // Blocks
 
+
+const present_block = {
+  timeline: [present_trial],
+  on_timeline_start: function(){
+    provide_feedback = true; 
+    phase = "Present";
+  }
+}
+
 const practice_block = {
   timeline: [train_trial],
   on_timeline_start: function(){
@@ -875,7 +1002,7 @@ if(typeof SONAID != 'undefined'){
 
 // Create Experiment
 
-  condition_1_timeline = [participant_info_paid, participant_info_SONA, demographics, instructions, practice_block, eff_rating, train_end, tetris, test_start, test_block, debug, save_data, DEBRIEF_SONA];
+  condition_1_timeline = [participant_info_paid, participant_info_SONA, demographics, instructions, present_block, practice_start, practice_block, eff_rating, train_end, test_block, debug, save_data, DEBRIEF_SONA];
 
   async function createExperiment(){
     const condition = await jsPsychPipe.getCondition(DataPipe_ID);
