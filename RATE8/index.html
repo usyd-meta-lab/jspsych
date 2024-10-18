@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>USYD Metacognition</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Load jsPsych and jquery-->
+  <script src="https://unpkg.com/jspsych@7.3.3"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/js/foundation.min.js'></script>
+  <link href="https://unpkg.com/jspsych@7.2.3/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <link href="https://unpkg.com/jquery-ui-css@1.11.5/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+
+
+
+  <!-- Load jsPsych plugins-->
+  <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-external-html@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-external-html@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-browser-check@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-call-function"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.2.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-html-form@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+
+  <!-- Load the global environment-->
+  <script src="global-env.js"></script>
+  <script src="info_sheets.js"></script>
+  
+
+  <!-- Some custom CSS-->
+  <link href="custom-css.css" rel="stylesheet" type="text/css" />
+
+</head>
+<body></body>
+<script>
+
+
+
+//////////////////////////////////
+//         Gloabl Settings      //
+//////////////////////////////////
+
+// Initalise jsPsych
+  const jsPsych = initJsPsych({
+   on_interaction_data_update: function(data) {
+     if(data.event == 'fullscreenexit' & pilot != 'true'){in_fullscreen = false}
+
+   },
+ on_finish: function(data) {
+   if(aborted == true){alert("You must use Chrome or Firefox to complete this experiment.")}
+     if(aborted == false) {  if(jsPsych.data.get().filter({trial_type: "Summary Trial"}).select('correct').mean() < 0.55){window.location = attention_redirect_link} else {window.location = redirect_link}}
+    //jsPsych.data.get().localSave('csv','mydata.csv');
+   }
+})
+
+
+// Settings (set these)
+
+  const DataPipe_ID = "YA4kUtjoIk6f" // The DataPipe ID for where the data should be stored
+
+  const sona_experiment_id = "NA"; // The SONA experiment ID 
+  const sona_credit_token = "NA"; // The SONA credit token 
+  const Prolific_redirect = "CHGWKNI0"; // The Prolific redirect link (to credit)
+  const Prolific_failed_check = "CHGWKNI0"; // The Prolific redirect link to NOT credit (manual review)
+  const task_time = 5; // time in minutes for the PIS 
+
+
+// Global parameters (might need to change)
+  const staircase_on = false; // Turn on/off staircasing 
+  var ratings_on = null; // Turn on/off confidence ratings 
+  const random_diff = false; // If true and the staircase is off then a spread of dots between 1 and 70 will be used
+  const rating_type = 'text' // Should be slider or text
+
+  var no_trials = 30; // number of trials in each block
+
+
+  var in_fullscreen = true;
+  var trialnum = 1;
+  var blocknum = 1;
+  aborted = false;
+  phase = null;
+
+  jsPsych.data.addProperties({staircase_on: staircase_on});
+  jsPsych.data.addProperties({ratings_on: ratings_on});
+
+
+//////////////////////////////////
+
+
+
+
+
+  // Browser Check
+
+
+  var browser_check = {
+    timeline: [
+    {  
+      type: jsPsychBrowserCheck,
+      inclusion_function: (data) => {
+        return ['chrome', 'firefox'].includes(data.browser) && data.mobile === false;
+      },
+      exclusion_message: (data) => {
+        aborted = true;
+        if(data.mobile){
+          return '<p style = "color: black;">You must use a desktop/laptop computer to participate in this experiment.</p>';
+        } else if(data.browser !== 'chrome'){
+          return '<p style = "color: black;">You must use Chrome or Firefox as your browser to complete this experiment.</p>'
+        }
+      },
+    }
+    ],
+    conditional_function: function(){
+      if(pilot === 'true'){
+        return false;
+      } else {
+        return true;
+      }
+    }}
+
+
+
+// Enter Fullscreen
+
+    var enter_fullscreen = {
+      timeline: [
+        {type: jsPsychFullscreen,
+        message: '<p style = "color: black;">To take part in the experiment, your browser must be in fullscreen mode. Exiting fullscreen mode will pause the experiment. <br></br>Please click the button below to enable fullscreen mode and continue.</p>',
+        fullscreen_mode: true,
+        on_finish: function(){
+          in_fullscreen = true;
+        }
+      }
+      ],
+      conditional_function: function(){
+        if(pilot === 'true'){
+          return false;
+        } else {
+          return true;
+        }
+      }
+    }
+
+
+
+
+// Instructions
+
+    var instructions = {
+      type: jsPsychInstructions,
+      on_load: function(){
+        document.body.style.backgroundColor = 'black'
+      },
+      pages: [
+        '<p class="instructions">Welcome to the task!</p>' +
+        '<p class="instructions">In this task, we will ask you to judge how much you agree with a series of statements.</p>' +
+        '<p class="instructions">You will rate each statement from -10 to +10. Give a statement a positive rating if you agree with it, a negative rating if you disagree with it, or a rationg of zero if you neither agree nor disagree with it.</p>' 
+        ],
+      show_clickable_nav: true
+    }
+
+
+
+
+
+
+
+/////////////// **********  A TRIAL  ***************************** ///////////////
+
+
+
+
+    var a_trial = {
+      data: function(){
+        return {trialnum: trialnum}
+      },
+      timeline: [
+
+
+// New Block
+      {
+        timeline: [
+        {
+          type: jsPsychInstructions,
+          pages: function(){
+           blocknumber = ((trialnum-1)/60) + 1;
+           return [
+            '<p>Block ' + blocknumber + '</p>' +
+            '<p>When you are ready to begin the block, please click "Next"</p>'
+            ]
+         },
+         show_clickable_nav: true
+       }
+
+       ],
+        conditional_function: function(){
+          if(trialnum === 1 | trialnum === 61){
+            return true;
+          } else {
+            return false;
+          }
+        }
+      },
+
+// Check Fullscreen
+      {
+        timeline: [
+
+          {type: jsPsychFullscreen,
+          message: '<p>You need to be in fullscreen mode to continue the experiment! <br></br> Please click the button below to enter fullscreen mode.<br></br><p>',
+          fullscreen_mode: true,
+          on_finish(){
+            in_fullscreen = true;
+          }
+        }
+        ],
+        conditional_function: function(){
+          if(in_fullscreen === true){
+            return false;
+          } else {
+            return true;
+          }
+        }
+      },
+
+// Fixation
+      {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<p id = "fixation" style = "color: white; font-size: 70px">+</p>',
+        choices: 'NO_KEYS',
+        trial_duration: 500,
+        on_finish: function(data){
+          data.trial_type = "Fixation";
+          document.body.style.backgroundColor = 'black'
+        }
+      },
+
+
+
+// Response
+
+
+      {
+        type: jsPsychHtmlSliderResponse,
+        stimulus: function(){
+          return ('<h3 style = "color:white; max-width: 795px;">' + jsPsych.timelineVariable('stim_image')+ '</h3>' +
+           "<p style = 'color: white;'>How much do you agree with this staement?</p><br>" +
+           '<div id = "conf1" class = "conf" style = "position: absolute; height: 25px; background-color: transparent; width: 795px; margin-top: 4px; margin-left: 0px; border-left: 5px solid white; border-right: 5px solid white; "></div>' +
+           '<div id = "conf1" class = "conf" style = "position: absolute; height: 25px; background-color: transparent; width: 400px; margin-top: 4px; margin-left: 0px; border-right: 5px solid white; "></div>')
+        },
+        min: 1,
+        max: 21,
+        step: 1,
+        slider_start: 11,
+        slider_width: 800,
+        require_movement: true,
+        labels: ['<p style = "color: white; font-size: 15pt;">-10</p>',  '<p style = "color: white; font-size: 15pt;">0</p>', '<p style = "color: white; font-size: 15pt;">+10</p>'],
+        button_label: "Submit",
+        on_finish: function(data){
+          data.trial_type = "Stimulus Response";
+
+        },
+        css_classes: ["conf_rating"]
+
+      },
+
+
+
+
+// Text CR
+
+      {
+        timeline: [
+
+        {
+          type: jsPsychSurveyText,
+          on_load: function(){
+            $('#jspsych-content').css('padding', '200');
+            $('#jspsych-content').css('background', '#ccc');
+            
+          },
+          on_finish: function(data){
+            data.trial_type = "Confidence Rating";
+            $('#jspsych-content').css('padding', '0');
+            $('#jspsych-content').css('background', 'black');
+          },
+          questions: [
+            {prompt: "<h3 style = 'color: black;'>How confident are you in your last response?</h3><p style = 'color: black;'>Enter a number between 0 (not at all confident) and 100 (totally confident)</p>", required: true, columns: 1}
+            ]
+        }
+
+        ],
+        conditional_function: function(){
+          if(rating_type == "text" & ratings_on === true){
+            return true;
+          } else {
+            return false;
+          }
+        }
+      },
+
+
+// Confidence Rating
+      {
+        timeline: [
+
+        {
+          type: jsPsychHtmlSliderResponse,
+          stimulus: function(data){ 
+
+            response = Number(jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last().values()[0].response);
+            response = response - 11;
+            return ("<h3 style = 'color: white;'>How confident are you in your last response?</h3>" +
+             '<div id = "conf1" class = "conf" style = "position: absolute; height: 25px; background-color: transparent; width: 795px; margin-top: 4px; margin-left: 0px; border-left: 5px solid white; border-right: 5px solid white; "></div>')
+          },
+          slider_width: 800,
+          require_movement: true,
+          labels: ['<p style = "color: white; font-size: 15pt;">Not at all</p>', "", "", "", "", '<p style = "color: white; font-size: 15pt;">Totally</p>'],
+          button_label: "Submit",
+          on_finish: function(data){
+            data.trial_type = "Confidence Rating";
+
+          },
+          css_classes: ["conf_rating"]
+
+        }
+
+        ],
+        conditional_function: function(){
+          if(rating_type == "slider" & ratings_on === true){
+            return true;
+          } else {
+            return false;
+          }
+        }
+      },
+
+
+
+
+// Summary trial to store all the data typically required (nothing is displayed to the particpant) and do the staircasing
+      {
+        type: jsPsychCallFunction,
+        func: function(data){
+
+          accuracy = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).select('correct').values;
+          accuracy = accuracy.slice(Math.max(accuracy.length - 2, 0))
+
+          if(staircase_on == true){
+            stairs = staircase(dots_diff, accuracy, trialnum);
+
+            dots_diff = stairs.diff;
+
+          }
+
+        },
+        on_finish: function(data){
+
+          data.rt = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last().values()[0].rt;
+          data.phase = phase;
+          data.response = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last().values()[0].response;
+          data.correct = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last().values()[0].correct;
+          data.stim_image = jsPsych.timelineVariable('stim_image');
+          if(ratings_on == true){
+            data.confidence = jsPsych.data.get().filter({trial_type: "Confidence Rating"}).last().values()[0].response;
+
+          } 
+
+
+          data.trial_type = "Summary Trial"
+          trialnum++;
+
+        }
+      },
+
+
+
+      ],
+timeline_variables: [
+  {stim_image: 'People dislike others who succeed in life. '},
+  {stim_image: 'People who become rich and successful forget the people who helped them along the way.'},
+  {stim_image: 'Opportunities for people to get wealthy promote dishonesty.'},
+  {stim_image: 'Kind-hearted people are easily bullied.'},
+  {stim_image: 'Adversity can be overcome by effort.'},
+  {stim_image: 'Difficult problems can be overcome by hard work and persistence.'},
+  {stim_image: 'Hard working people will achieve more in the end.'},
+  {stim_image: 'Endurance and determination are key to achieving goals. '},
+  {stim_image: 'A person&#39;s behavior is influenced by many factors.'},
+  {stim_image: 'Many issues appear far more complicated than they really are. '},
+  {stim_image: 'People may have opposite behaviors on different occasions.'},
+  {stim_image: 'One has to deal with matters according to the specific circumstances.'},
+  {stim_image: 'Fate determines one&#39;s successes and failures.'},
+  {stim_image: 'Fate determines a person&#39;s success in life.'},
+  {stim_image: 'Matters of life and death are determined by fate.'},
+  {stim_image: 'Individual characteristics, such as appearance and birthday, can reveal one’s fate.'},
+  {stim_image: 'Belief in a religion helps one understand the meaning of life. '},
+  {stim_image: 'Belief in a religion makes people good citizens.'},
+  {stim_image: 'Religion makes people healthier.'},
+  {stim_image: 'Religion helps people make good choices for their lives.'}
+
+
+  ],
+randomize_order: true
+};
+
+
+
+
+
+
+
+var debug = {
+  type: jsPsychSurveyText,
+  questions: [
+    {prompt: 'Did you experience any issues while completing this study?', rows: 5}
+    ]
+}
+
+
+
+  // Blocks
+
+
+const test_block = {
+  timeline: [a_trial],
+  on_timeline_start: function(){
+    provide_feedback = false; 
+    phase = "Test";
+  }
+}
+
+
+
+
+
+
+
+
+// Save data and redirect [shouldn't need to edit below]
+
+
+
+
+
+// Capture any url paramaters
+const PROLIFIC_PID = jsPsych.data.getURLVariable('PROLIFIC_PID');
+const SONAID = jsPsych.data.getURLVariable('SONAID');
+const pilot = jsPsych.data.getURLVariable('pilot');
+
+
+// Redirect based on SONA vs Prolific
+
+    // SONA
+if(typeof SONAID != 'undefined'){
+
+  jsPsych.data.addProperties({participant_id: SONAID});
+  jsPsych.data.addProperties({Source: "SONA"});
+
+  redirect_link = "https://sydneypsych.sona-systems.com/webstudy_credit.aspx?experiment_id="+sona_experiment_id+"&credit_token="+sona_credit_token+"&survey_code=" + SONAID + "&id=" + SONAID;
+    attention_redirect_link = "https://sydney.au1.qualtrics.com/jfe/form/SV_3h2qh8pBAnv00QK?SONAID=" + SONAID + "accuracy=" + jsPsych.data.get().filter({trial_type: "Summary Trial"}).select('correct').mean(); // A seperate link for those who fail the attention check
+
+
+  }
+
+    // PROLIFIC
+  if(typeof SONAID === 'undefined'){
+
+    jsPsych.data.addProperties({participant_id: PROLIFIC_PID});
+    jsPsych.data.addProperties({Source: "Prolific"});
+
+    redirect_link ="https://app.prolific.com/submissions/complete?cc=" + Prolific_redirect;
+    attention_redirect_link ="https://app.prolific.co/submissions/complete?cc=" + Prolific_failed_check; // A seperate link for those who fail the attention check
+  }
+
+
+
+
+  // Save to OSF
+  const subject_id = jsPsych.randomization.randomID(10);
+  const filename = `${subject_id}.csv`;
+
+
+
+  const save_data = {
+    type: jsPsychPipe,
+    action: "save",
+    experiment_id: DataPipe_ID,
+    filename: filename,
+    data_string: ()=>jsPsych.data.get().csv()
+  };
+
+
+
+// Create Experiment
+//browser_check, enter_fullscreen, participant_info_paid, participant_info_SONA, demographics, instructions,
+  condition_1_timeline = [browser_check, enter_fullscreen, participant_info_paid, participant_info_SONA, demographics, instructions, test_block, debug, save_data, DEBRIEF_SONA ];
+
+  async function createExperiment(){
+    const condition = await jsPsychPipe.getCondition(DataPipe_ID);
+    jsPsych.data.addProperties({condition: condition});
+    if(condition == 0) { timeline = condition_1_timeline; ratings_on = false}
+    if(condition == 1) { timeline = condition_1_timeline; ratings_on = true}
+    jsPsych.run(timeline);
+  }
+
+
+
+
+  createExperiment();
+
+
+</script>
+</html>

@@ -1,0 +1,20 @@
+.conf_rating .jspsych-html-slider-response-container #jspsych-html-slider-response-response::-webkit-slider-runnable-track {
+  background: white;
+  border: 0;
+
+}
+
+
+\
+
+.conf_rating .jspsych-html-slider-response-container #jspsych-html-slider-response-response::-webkit-slider-thumb {
+ -webkit-appearance: none;
+  appearance: none;
+   margin-top: -7.5px;
+
+}
+
+
+p {
+  color: white;
+}
