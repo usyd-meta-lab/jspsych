@@ -56,8 +56,8 @@
 
    },
  on_finish: function(data) {
-   if(aborted == true){alert("You must use Chrome or Firefox to complete this experiment.")}
-     if(aborted == false) {  if(jsPsych.data.get().filter({trial_type: "Summary Trial"}).select('correct').mean() < 0.55){window.location = attention_redirect_link} else {window.location = redirect_link}}
+   //if(aborted == true){alert("You must use Chrome or Firefox to complete this experiment.")}
+     //if(aborted == false) {  if(jsPsych.data.get().filter({trial_type: "Summary Trial"}).select('correct').mean() < 0.55){window.location = attention_redirect_link} else {window.location = redirect_link}}
     //jsPsych.data.get().localSave('csv','mydata.csv');
    }
 })
