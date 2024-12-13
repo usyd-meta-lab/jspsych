@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>USYD Cognitive Flexibility</title>
+
+  <!-- Load jsPsych and jquery-->
+  <script src="https://unpkg.com/jspsych@7.2.1"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/js/foundation.min.js'></script>
+  <link href="https://unpkg.com/jspsych@7.2.3/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jcanvas/21.0.1/min/jcanvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/1.0.2/chartjs-plugin-annotation.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-dragdata@2.2.3/dist/chartjs-plugin-dragdata.min.js"></script>
+
+  <!-- Load jsPsych plugins-->
+  <script src="https://unpkg.com/@jspsych/plugin-instructions@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-external-html@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-call-function"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-html-form@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+
+  <!-- Load the global environment-->
+  <script src="global-env.js"></script>
+
+  <!-- Load custom plugins from directory-->
+  <link href="custom.css" rel="stylesheet" type="text/css" />
+
+
+
+</head>
+<body></body>
+<script>
+
+
+
+//////////////////////////////////
+//         Gloabl Settings      //
+//////////////////////////////////
+
+// Initalise jsPsych
+  const jsPsych = initJsPsych({
+    on_finish: function(data) {
+      //jsPsych.data.get().localSave('csv','mydata.csv');
+     window.location = redirect_link
+   }
+ })
+
+
+// Settings
+  const redirect_link ="https://app.prolific.co/submissions/complete?cc=C1JLSEU3"
+
+
+
+// Capture any url paramaters
+  const PROLIFIC_PID = jsPsych.data.getURLVariable('PROLIFIC_PID');
+
+  // Save to OSF
+  const subject_id = jsPsych.randomization.randomID(10);
+  const filename = `${subject_id}.csv`;
+
+
+
+  const save_data = {
+    type: jsPsychPipe,
+    action: "save",
+    experiment_id: "kf7Vo17oslAf",
+    filename: filename,
+    data_string: ()=>jsPsych.data.get().csv()
+  };
+
+
+//////////////////////////////////
+
+
+
+  condition = jsPsych.randomization.sampleWithoutReplacement(["CR", "NoCR"],1)
+  jsPsych.data.addProperties({condition: condition})
+
+  // Trials
+  trialnum = 1;
+  input1_array = [];
+  input2_array = [];
+  input3_array = [];
+  output1_array = [];
+  output2_array = [];
+  output3_array = [];
+
+  const input_trial = {
+    type: jsPsychHtmlButtonResponse,
+    css_classes: ['CPS'],
+    margin_vertical: '4%',
+    data: { trial_name: 'training' },
+    stimulus: `<div style = "padding-bottom: 10%;" class="row">
+    <div style = " float: left; padding-right: 3%; width: 31%;" class="column">
+    <canvas id="chart1"></canvas>
+    </div>
+    <div style = "float: left; padding-right: 3%; width: 31%;" class="column">
+    <canvas id="chart2"></canvas>
+    </div>
+    <div style = "float: left; width: 31%;" class="column">
+    <canvas id="chart3"></canvas>
+    </div>
+    </div>` +
+    `<div style = "padding-top: 10%;"class="row">
+    <div style = " float: left; padding-right: 3%; width: 31%;" class="column outputs">
+    <canvas id="chart4"></canvas>
+    </div>
+    <div style = "float: left; padding-right: 3%; width: 31%;" class="column outputs">
+    <canvas id="chart5"></canvas>
+    </div>
+    <div style = "float: left; width: 31%;" class="column outputs">
+    <canvas id="chart6"></canvas>
+    </div>
+    </div>`,
+    choices: ["Simulate"],
+    on_finish: function(data){
+
+
+// Set the equations
+      ev1 = 1;
+      ev2 = 1;
+      ev3 = 1;
+
+      ax = 0.8;
+      ay = 0.8;
+      az = 0;
+
+      bx = 1.6;
+      by = 0;
+      bz = 0;
+
+      cx = 0;
+      cy = 0;
+      cz = -1;
+
+// Save response
+      data.input1 = input1_value;
+      data.input2 = input2_value;
+      data.input3 = input3_value;
+      input1_array.push(input1_value);
+      input2_array.push(input2_value);
+      input3_array.push(input3_value);
+
+
+// Store trialnum
+      data.trialnum = trialnum;
+
+// Calculate new output values
+      out1_value = output1_data[trialnum - 1]*ev1 + ax*input1_value + bx*input2_value + cx*input3_value;
+      out2_value = output2_data[trialnum - 1]*ev2 + ay*input1_value + by*input2_value + cy*input3_value;
+      out3_value = output3_data[trialnum - 1]*ev3 + az*input1_value + bz*input2_value + cz*input3_value;
+
+
+// Push new outputs to the chart
+      output1_data.push(out1_value);
+      output2_data.push(out2_value);
+      output3_data.push(out3_value);
+
+
+// Store output values
+      data.output1 = out1_value;
+      data.output2= out2_value;
+      data.output3 = out3_value;
+
+
+    },
+    on_load: function(){
+
+
+//  Require all inputs be entered
+     // $(".jspsych-btn").prop('disabled', true);
+      
+
+
+// Variables
+      x = jsPsych.randomization.repeat([1], total_no_of_trials);
+
+      input1_data = input1_data.concat(x);
+      input2_data = input2_data.concat(x);
+      input3_data = input3_data.concat(x);
+      output1_data = output1_data;
+      output2_data = output2_data;
+      output3_data = output3_data;
+      input1_value = null;
+      input2_value = null;
+      input3_value = null;
+      tooltips = false; 
+
+// Chart 1
+      const ctx1 = document.getElementById('chart1');
+      input1 = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+          labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+          datasets: [{
+            data: input1_data,
+            backgroundColor: jsPsych.randomization.repeat(["#3e95cd"], total_no_of_trials),
+            fill: true,
+            tension: 0.4,
+            borderWidth: 1,
+            pointHitRadius: 25 
+          }]
+        },
+        options: {
+          plugins: {
+            tooltip: {
+              enabled: tooltips
+            },
+            annotation: {
+              annotations: {
+                box1: {
+                  type: 'box',
+                  xMin: -0.5,
+                  xMax: total_no_of_trials,
+                  yMin: 0,
+                  yMax: 1,
+                  backgroundColor: 'black'
+                },
+                box2: {
+                  type: 'box',
+                  xMin: trialnum-1.5,
+                  xMax: trialnum-0.5,
+                  yMin: 0,
+                  yMax: 1,
+                  backgroundColor: 'grey'
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: "A",
+              font: {size: 24}
+            },
+            legend: {
+             display: false},
+             dragData: {
+              round: 1, 
+              showTooltip: true, 
+              onDragStart: function(e, datasetIndex, index, value) {
+                if (index != trialnum -1) {
+                  return false
+                }
+                input1.options.plugins.annotation.annotations.box2.backgroundColor = "green"
+              },
+              onDrag: function(e, datasetIndex, index, value) {         
+
+              },
+              onDragEnd: function(e, datasetIndex, index, value) {
+                input1_value = value-1;
+                if(input1_value != null & input2_value != null & input3_value != null){ $(".jspsych-btn").prop('disabled', false);}
+              },
+            },  
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 5,
+              min: -5,
+              title: {
+                display: true,
+                text: "Inputs"
+              },
+              grid: {
+                display: false,
+              },
+              ticks: {
+                display: false
+              }
+
+            }
+          }
+
+        }
+      });
+
+// Chart 2
+
+      const ctx2 = document.getElementById('chart2');
+      input2 = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+          datasets: [{
+            data: input2_data,
+            fill: true,
+            backgroundColor: jsPsych.randomization.repeat(["#8e5ea2"], total_no_of_trials),
+            tension: 0.4,
+            borderWidth: 1,
+            pointHitRadius: 25 
+          }]
+        },
+        options: {
+          plugins: {
+            tooltip: {
+              enabled: tooltips
+            },
+            annotation: {
+              annotations: {
+                box1: {
+                  type: 'box',
+                  xMin: -0.5,
+                  xMax: total_no_of_trials,
+                  yMin: 0,
+                  yMax: 1,
+                  backgroundColor: 'black'
+                },
+                box2: {
+                  type: 'box',
+                  xMin: trialnum-1.5,
+                  xMax: trialnum-0.5,
+                  yMin: 0,
+                  yMax: 1,
+                  backgroundColor: 'grey'
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: "B",
+              font: {size: 24}
+            },
+            legend: {
+             display: false},
+             dragData: {
+              round: 1, 
+              showTooltip: true, 
+              onDragStart: function(e, datasetIndex, index, value) {
+
+                if (index != trialnum-1) {
+                //  return false
+                }
+                input2.options.plugins.annotation.annotations.box2.backgroundColor = "green"
+              },
+              onDrag: function(e, datasetIndex, index, value) {         
+
+              },
+              onDragEnd: function(e, datasetIndex, index, value) {
+                input2_value = value-1;
+
+                if(input1_value != null & input2_value != null & input3_value != null){ $(".jspsych-btn").prop('disabled', false);}
+              },
+            },  
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 5,
+              min: -5,
+              grid: {
+                display: false,
+              },
+              ticks: {
+                display: false
+              }
+
+            }
+          }
+
+        }
+      });
+
+
+
+// Chart 3
+      const ctx3 = document.getElementById('chart3');
+      input3 = new Chart(ctx3, {
+        type: 'bar',
+        data: {
+          labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+          datasets: [{
+            data: input3_data,
+            fill: true,
+            backgroundColor: jsPsych.randomization.repeat(["#3cba9f"], total_no_of_trials),
+            tension: 0.4,
+            borderWidth: 1,
+            pointHitRadius: 25 
+          }]
+        },
+        options: {
+          plugins: {
+            tooltip: {
+              enabled: tooltips
+            },
+            annotation: {
+              annotations: {
+                box1: {
+                  type: 'box',
+                  xMin: -0.5,
+                  xMax: total_no_of_trials,
+                  yMin: 0,
+                  yMax: 1,
+                  backgroundColor: 'black'
+                },
+                box2: {
+                  type: 'box',
+                  xMin: trialnum-1.5,
+                  xMax: trialnum-0.5,
+                  yMin: 0,
+                  yMax: 1,
+                  backgroundColor: 'grey'
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: "C",
+              font: {size: 24}
+            },
+            legend: {
+             display: false},
+             dragData: {
+              round: 1, 
+              showTooltip: true, 
+              onDragStart: function(e, datasetIndex, index, value) {
+                if (index != trialnum -1) {
+                  return false
+                }
+                input3.options.plugins.annotation.annotations.box2.backgroundColor = "green"
+              },
+              onDrag: function(e, datasetIndex, index, value) {         
+
+              },
+              onDragEnd: function(e, datasetIndex, index, value) {
+                input3_value = value-1;
+
+                if(input1_value != null & input2_value != null & input3_value != null){ $(".jspsych-btn").prop('disabled', false);}  
+              },
+            },  
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 5,
+              min: -5,
+              grid: {
+                display: false,
+              },
+              ticks: {
+                display: false
+              }
+
+            }
+          }
+
+        }
+      });
+
+
+
+// Chart 4
+      const ctx4 = document.getElementById('chart4');
+      output1 = new Chart(ctx4, {
+        type: 'line',
+        data: {
+          labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+          datasets: [{
+            data: output1_data,
+            fill: false,
+            backgroundColor: ["#D65108"],
+            tension: 0.4,
+            borderWidth: 1,
+            pointHitRadius: 25 
+          }]
+        },
+        options: {
+          plugins: {
+            tooltip: {
+              enabled: tooltips
+            },
+            annotation: {
+              annotations: {
+                line1: {
+                  type: 'line',
+                  yMin: 1,
+                  yMax: 1,
+                  borderColor: 'transparent',
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: "X",
+              font: {size: 24}
+            },
+            legend: {
+             display: false
+           },  
+         },
+         scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            min: -50,
+            title: {
+              display: true,
+              text: "Outputs"
+            },
+            grid: {
+              display: false,
+            },
+            ticks: {
+              display: false
+            }
+
+          }
+        }
+
+      }
+    });
+
+
+
+
+
+// Chart 5
+      const ctx5 = document.getElementById('chart5');
+      output5 = new Chart(ctx5, {
+        type: 'line',
+        data: {
+          labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+          datasets: [{
+            data: output2_data,
+            fill: false,
+            backgroundColor: ["#591F0A"],
+            tension: 0.4,
+            borderWidth: 1,
+            pointHitRadius: 25 
+          }]
+        },
+        options: {
+          plugins: {
+            tooltip: {
+              enabled: tooltips
+            },
+            annotation: {
+              annotations: {
+                line1: {
+                  type: 'line',
+                  yMin: 4,
+                  yMax: 4,
+                  borderColor: 'transparent',
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: "Y",
+              font: {size: 24}
+            },
+            legend: {
+             display: false
+           },  
+         },
+         scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            min: -50,
+            grid: {
+              display: false,
+            },
+            ticks: {
+              display: false
+            }
+
+          }
+        }
+
+      }
+    });
+
+
+
+
+
+
+// Chart 6
+      const ctx6 = document.getElementById('chart6');
+      output2 = new Chart(ctx6, {
+        type: 'line',
+        data: {
+          labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+          datasets: [{
+            data: output2_data,
+            fill: false,
+            backgroundColor: ["#50B2C0"],
+            tension: 0.4,
+            borderWidth: 1,
+            pointHitRadius: 25 
+          }]
+        },
+        options: {
+          plugins: {
+            tooltip: {
+              enabled: tooltips
+            },
+            annotation: {
+              annotations: {
+                line1: {
+                  type: 'line',
+                  yMin: 8,
+                  yMax: 8,
+                  borderColor: 'transparent',
+                }
+              }
+            },
+            title: {
+              display: true,
+              text: "Z",
+              font: {size: 24}
+            },
+            legend: {
+             display: false
+           },  
+         },
+         scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            min: -50,
+            grid: {
+              display: false,
+            },
+            ticks: {
+              display: false
+            }
+
+          }
+        }
+
+      }
+    });
+
+
+
+
+    }
+  }
+
+
+  // Feedback
+
+
+  const feedback = {
+    type: jsPsychHtmlButtonResponse,
+    css_classes: ['CPS'],
+    margin_vertical: '4%',
+    data: { trial_name: 'Feedback' },
+    stimulus: `<div style = "padding-bottom: 10%;" class="row">
+    <div style = " float: left; padding-right: 3%; width: 31%;" class="column">
+    <canvas id="chart1"></canvas>
+    </div>
+    <div style = "float: left; padding-right: 3%; width: 31%;" class="column">
+    <canvas id="chart2"></canvas>
+    </div>
+    <div style = "float: left; width: 31%;" class="column">
+    <canvas id="chart3"></canvas>
+    </div>
+    </div>` +
+    `<div style = "padding-top: 10%;"class="row">
+    <div style = " float: left; padding-right: 3%; width: 31%;" class="column outputs">
+    <canvas id="chart4"></canvas>
+    </div>
+    <div style = "float: left; padding-right: 3%; width: 31%;" class="column outputs">
+    <canvas id="chart5"></canvas>
+    </div>
+    <div style = "float: left; width: 31%;" class="column outputs">
+    <canvas id="chart6"></canvas>
+    </div>
+    </div>`,
+    choices: ["Continue"],
+    on_finish: function(data){
+
+      // Stroe inout values
+      data.input1 = input1_value;
+      data.input2 = input2_value;
+      data.input3 = input3_value;
+      
+      // Store output values
+      data.output1 = out1_value;
+      data.output2= out2_value;
+      data.output3 = out3_value;
+
+      // Index trialnum
+      data.trialnum = trialnum;
+      trialnum = trialnum + 1;
+
+
+    },
+    on_load: function(){
+
+
+// Flash the screen orange
+
+      function make_orange() {
+  var elements = document.getElementsByClassName('outputs'); // get all elements
+  for(var i = 0; i < elements.length; i++){
+    elements[i].style.backgroundColor = "#F0B27A";
+  }
+}
+make_orange()
+
+
+function make_clear() {
+  var elements = document.getElementsByClassName('outputs'); // get all elements
+  for(var i = 0; i < elements.length; i++){
+    elements[i].style.backgroundColor = "transparent";
+  }
+}
+
+
+setTimeout(make_clear, 500)
+
+
+
+
+// Variables
+
+input1_data = input1_array;
+input2_data = input2_array;
+input3_data = input3_array;
+output1_data = output1_data;
+output2_data = output2_data;
+output3_data = output3_data;
+input1_value = null;
+input2_value = null;
+input3_value = null;
+output1 = null;
+output2 = null;
+output3 = null;
+tooltips = true; 
+
+// Chart 1
+const ctx1 = document.getElementById('chart1');
+input1 = new Chart(ctx1, {
+  type: 'bar',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: input1_data,
+      fill: true,
+      backgroundColor: jsPsych.randomization.repeat(["#3e95cd"], total_no_of_trials),
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          box1: {
+            type: 'box',
+            xMin: -0.5,
+            xMax: total_no_of_trials,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'black'
+          },
+          box2: {
+            type: 'box',
+            xMin: trialnum-1.5,
+            xMax: trialnum-0.5,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'grey'
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "A",
+        font: {size: 24}
+      },
+      legend: {
+       display: false},
+       dragData: {
+        round: 1, 
+        showTooltip: true, 
+        onDragStart: function(e, datasetIndex, index, value) {
+          if (index > trialnum-1) {
+            return false
+          }
+          input1.options.plugins.annotation.annotations.box2.backgroundColor = "green"
+        },
+        onDrag: function(e, datasetIndex, index, value) {         
+
+        },
+        onDragEnd: function(e, datasetIndex, index, value) {
+
+          input1_value = value;
+          if(input1_value != null & input2_value != null & input3_value != null){ $(".jspsych-btn").prop('disabled', false);}
+        },
+      },  
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 5,
+        min: -5,
+        title: {
+          display: true,
+          text: "Inputs"
+        },
+        grid: {
+          display: false,
+        },
+        ticks: {
+          display: false
+        }
+
+      }
+    }
+
+  }
+});
+
+// Chart 2
+
+const ctx2 = document.getElementById('chart2');
+input2 = new Chart(ctx2, {
+  type: 'bar',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: input2_data,
+      fill: true,
+      backgroundColor: jsPsych.randomization.repeat(["#8e5ea2"], total_no_of_trials),
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          box1: {
+            type: 'box',
+            xMin: -0.5,
+            xMax: total_no_of_trials,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'black'
+          },
+          box2: {
+            type: 'box',
+            xMin: trialnum-1.5,
+            xMax: trialnum-0.5,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'grey'
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "B",
+        font: {size: 24}
+      },
+      legend: {
+       display: false},
+       dragData: {
+        round: 1, 
+        showTooltip: true, 
+        onDragStart: function(e, datasetIndex, index, value) {
+          if (index > trialnum-1) {
+            return false
+          }
+          input2.options.plugins.annotation.annotations.box2.backgroundColor = "green"
+        },
+        onDrag: function(e, datasetIndex, index, value) {         
+
+        },
+        onDragEnd: function(e, datasetIndex, index, value) {
+          input2_value = value;
+          if(input1_value != null & input2_value != null & input3_value != null){ $(".jspsych-btn").prop('disabled', false);}
+        },
+      },  
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 5,
+        min: -5,
+        grid: {
+          display: false,
+        },
+        ticks: {
+          display: false
+        }
+
+      }
+    }
+
+  }
+});
+
+
+
+// Chart 3
+const ctx3 = document.getElementById('chart3');
+input3 = new Chart(ctx3, {
+  type: 'bar',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: input3_data,
+      fill: true,
+      backgroundColor: jsPsych.randomization.repeat(["#3cba9f"], total_no_of_trials),
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          box1: {
+            type: 'box',
+            xMin: -0.5,
+            xMax: total_no_of_trials,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'black'
+          },
+          box2: {
+            type: 'box',
+            xMin: trialnum-1.5,
+            xMax: trialnum-0.5,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'grey'
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "C",
+        font: {size: 24}
+      },
+      legend: {
+       display: false},
+       dragData: {
+        round: 1, 
+        showTooltip: true, 
+        onDragStart: function(e, datasetIndex, index, value) {
+          if (index > trialnum-1) {
+            return false
+          }
+          input3.options.plugins.annotation.annotations.box2.backgroundColor = "green"
+        },
+        onDrag: function(e, datasetIndex, index, value) {         
+
+        },
+        onDragEnd: function(e, datasetIndex, index, value) {
+          input3_value = value;
+          if(input1_value != null & input2_value != null & input3_value != null){ $(".jspsych-btn").prop('disabled', false);}  
+        },
+      },  
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 5,
+        min: -5,
+        grid: {
+          display: false,
+        },
+        ticks: {
+          display: false
+        }
+
+      }
+    }
+
+  }
+});
+
+
+
+// Chart 4
+const ctx4 = document.getElementById('chart4');
+output1 = new Chart(ctx4, {
+  type: 'line',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: output1_data,
+      fill: false,
+      backgroundColor: ["#D65108"],
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          line1: {
+            type: 'line',
+            yMin: 1,
+            yMax: 1,
+            borderColor: 'transparent',
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "X",
+        font: {size: 24}
+      },
+      legend: {
+       display: false
+     },  
+   },
+   scales: {
+    y: {
+      beginAtZero: true,
+      max: 100,
+      min: -50,
+      title: {
+        display: true,
+        text: "Outputs"
+      },
+      grid: {
+        display: false,
+      },
+      ticks: {
+        display: false
+      }
+
+    }
+  }
+
+}
+});
+
+
+
+
+
+// Chart 5
+const ctx5 = document.getElementById('chart5');
+output5 = new Chart(ctx5, {
+  type: 'line',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: output2_data,
+      fill: false,
+      backgroundColor: ["#591F0A"],
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          line1: {
+            type: 'line',
+            yMin: 4,
+            yMax: 4,
+            borderColor: 'transparent',
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "Y",
+        font: {size: 24}
+      },
+      legend: {
+       display: false
+     },  
+   },
+   scales: {
+    y: {
+      beginAtZero: true,
+      max: 100,
+      min: -50,
+      grid: {
+        display: false,
+      },
+      ticks: {
+        display: false
+      }
+
+    }
+  }
+
+}
+});
+
+
+
+
+
+
+// Chart 6
+const ctx6 = document.getElementById('chart6');
+output2 = new Chart(ctx6, {
+  type: 'line',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: output2_data,
+      fill: false,
+      backgroundColor: ["#50B2C0"],
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          line1: {
+            type: 'line',
+            yMin: 8,
+            yMax: 8,
+            borderColor: 'transparent',
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "Z",
+        font: {size: 24}
+      },
+      legend: {
+       display: false
+     },  
+   },
+   scales: {
+    y: {
+      beginAtZero: true,
+      max: 100,
+      min: -50,
+      grid: {
+        display: false,
+      },
+      ticks: {
+        display: false
+      }
+
+    }
+  }
+
+}
+});
+
+
+
+
+}
+}
+
+
+
+
+  // Confidence Rating
+
+
+const conf_rating = {
+  type: jsPsychHtmlSliderResponse,
+  css_classes: ['CPS', 'CR'],
+  margin_vertical: '4%',
+  labels: ["0%", "20%", '40%', '60%', "80%", '100%'],
+  require_movement: true,
+  data: { trial_name: 'confidence' },
+  stimulus: `<div style = "padding-bottom: 0%; padding-bottom: 10%;" class="row">
+  <div style = " float: left; padding-right: 3%; width: 31%;" class="column">
+  <canvas id="chart1"></canvas>
+  </div>
+  <div style = "float: left; padding-right: 3%; width: 31%;" class="column">
+  <canvas id="chart2"></canvas>
+  </div>
+  <div style = "float: left; width: 31%;" class="column">
+  <canvas id="chart3"></canvas>
+  </div>
+  </div>` +
+  `<div style = "padding-top: 10%; padding-bottom: 10%;"class="row">
+  <div style = " float: left; padding-right: 3%; width: 31%;" class="column outputs">
+  <canvas id="chart4"></canvas>
+  </div>
+  <div style = "float: left; padding-right: 3%; width: 31%;" class="column outputs">
+  <canvas id="chart5"></canvas>
+  </div>
+  <div style = "float: left; width: 31%;" class="column outputs">
+  <canvas id="chart6"></canvas>
+  </div>
+  </div>` +
+  `<div  style = "padding-top: 7%;"><p>Before you continue, how confident are you that you've learnt the relationships between the inputs and outputs?</p></div>`,
+  choices: ["Continue"],
+  on_finish: function(data){
+
+      // Stroe inout values
+    data.input1 = input1_value;
+    data.input2 = input2_value;
+    data.input3 = input3_value;
+
+      // Store output values
+    data.output1 = out1_value;
+    data.output2= out2_value;
+    data.output3 = out3_value;
+
+      // Index trialnum
+    data.trialnum = trialnum;
+    trialnum = trialnum + 1;
+
+
+  },
+  on_load: function(){
+
+
+// Flash the screen orange
+
+    function make_orange() {
+  var elements = document.getElementsByClassName('outputs'); // get all elements
+  for(var i = 0; i < elements.length; i++){
+    elements[i].style.backgroundColor = "#F0B27A";
+  }
+}
+make_orange()
+
+
+function make_clear() {
+  var elements = document.getElementsByClassName('outputs'); // get all elements
+  for(var i = 0; i < elements.length; i++){
+    elements[i].style.backgroundColor = "transparent";
+  }
+}
+
+
+setTimeout(make_clear, 500)
+
+
+
+
+// Variables
+
+input1_data = input1_array;
+input2_data = input2_array;
+input3_data = input3_array;
+output1_data = output1_data;
+output2_data = output2_data;
+output3_data = output3_data;
+input1_value = null;
+input2_value = null;
+input3_value = null;
+output1 = null;
+output2 = null;
+output3 = null;
+tooltips = true; 
+
+// Chart 1
+const ctx1 = document.getElementById('chart1');
+input1 = new Chart(ctx1, {
+  type: 'bar',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: input1_data,
+      fill: true,
+      backgroundColor: jsPsych.randomization.repeat(["#3e95cd"], total_no_of_trials),
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          box1: {
+            type: 'box',
+            xMin: -0.5,
+            xMax: total_no_of_trials,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'black'
+          },
+          box2: {
+            type: 'box',
+            xMin: trialnum-1.5,
+            xMax: trialnum-0.5,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'grey'
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "A",
+        font: {size: 24}
+      },
+      legend: {
+       display: false},
+       dragData: {
+        round: 1, 
+        showTooltip: true, 
+        onDragStart: function(e, datasetIndex, index, value) {
+          if (index > trialnum-1) {
+            return false
+          }
+          input1.options.plugins.annotation.annotations.box2.backgroundColor = "green"
+        },
+        onDrag: function(e, datasetIndex, index, value) {         
+
+        },
+        onDragEnd: function(e, datasetIndex, index, value) {
+
+          input1_value = value;
+          if(input1_value != null & input2_value != null & input3_value != null){ $(".jspsych-btn").prop('disabled', false);}
+        },
+      },  
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 5,
+        min: -5,
+        title: {
+          display: true,
+          text: "Inputs"
+        },
+        grid: {
+          display: false,
+        },
+        ticks: {
+          display: false
+        }
+
+      }
+    }
+
+  }
+});
+
+// Chart 2
+
+const ctx2 = document.getElementById('chart2');
+input2 = new Chart(ctx2, {
+  type: 'bar',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: input2_data,
+      fill: true,
+      backgroundColor: jsPsych.randomization.repeat(["#8e5ea2"], total_no_of_trials),
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          box1: {
+            type: 'box',
+            xMin: -0.5,
+            xMax: total_no_of_trials,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'black'
+          },
+          box2: {
+            type: 'box',
+            xMin: trialnum-1.5,
+            xMax: trialnum-0.5,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'grey'
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "B",
+        font: {size: 24}
+      },
+      legend: {
+       display: false},
+       dragData: {
+        round: 1, 
+        showTooltip: true, 
+        onDragStart: function(e, datasetIndex, index, value) {
+          if (index > trialnum-1) {
+            return false
+          }
+          input2.options.plugins.annotation.annotations.box2.backgroundColor = "green"
+        },
+        onDrag: function(e, datasetIndex, index, value) {         
+
+        },
+        onDragEnd: function(e, datasetIndex, index, value) {
+          input2_value = value;
+          if(input1_value != null & input2_value != null & input3_value != null){ $(".jspsych-btn").prop('disabled', false);}
+        },
+      },  
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 5,
+        min: -5,
+        grid: {
+          display: false,
+        },
+        ticks: {
+          display: false
+        }
+
+      }
+    }
+
+  }
+});
+
+
+
+// Chart 3
+const ctx3 = document.getElementById('chart3');
+input3 = new Chart(ctx3, {
+  type: 'bar',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: input3_data,
+      fill: true,
+      backgroundColor: jsPsych.randomization.repeat(["#3cba9f"], total_no_of_trials),
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          box1: {
+            type: 'box',
+            xMin: -0.5,
+            xMax: total_no_of_trials,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'black'
+          },
+          box2: {
+            type: 'box',
+            xMin: trialnum-1.5,
+            xMax: trialnum-0.5,
+            yMin: 0,
+            yMax: 1,
+            backgroundColor: 'grey'
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "C",
+        font: {size: 24}
+      },
+      legend: {
+       display: false},
+       dragData: {
+        round: 1, 
+        showTooltip: true, 
+        onDragStart: function(e, datasetIndex, index, value) {
+          if (index > trialnum-1) {
+            return false
+          }
+          input3.options.plugins.annotation.annotations.box2.backgroundColor = "green"
+        },
+        onDrag: function(e, datasetIndex, index, value) {         
+
+        },
+        onDragEnd: function(e, datasetIndex, index, value) {
+          input3_value = value;
+          if(input1_value != null & input2_value != null & input3_value != null){ $(".jspsych-btn").prop('disabled', false);}  
+        },
+      },  
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        max: 5,
+        min: -5,
+        grid: {
+          display: false,
+        },
+        ticks: {
+          display: false
+        }
+
+      }
+    }
+
+  }
+});
+
+
+
+// Chart 4
+const ctx4 = document.getElementById('chart4');
+output1 = new Chart(ctx4, {
+  type: 'line',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: output1_data,
+      fill: false,
+      backgroundColor: ["#D65108"],
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          line1: {
+            type: 'line',
+            yMin: 1,
+            yMax: 1,
+            borderColor: 'transparent',
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "X",
+        font: {size: 24}
+      },
+      legend: {
+       display: false
+     },  
+   },
+   scales: {
+    y: {
+      beginAtZero: true,
+      max: 100,
+      min: -50,
+      title: {
+        display: true,
+        text: "Outputs"
+      },
+      grid: {
+        display: false,
+      },
+      ticks: {
+        display: false
+      }
+
+    }
+  }
+
+}
+});
+
+
+
+
+
+// Chart 5
+const ctx5 = document.getElementById('chart5');
+output5 = new Chart(ctx5, {
+  type: 'line',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: output2_data,
+      fill: false,
+      backgroundColor: ["#591F0A"],
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          line1: {
+            type: 'line',
+            yMin: 4,
+            yMax: 4,
+            borderColor: 'transparent',
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "Y",
+        font: {size: 24}
+      },
+      legend: {
+       display: false
+     },  
+   },
+   scales: {
+    y: {
+      beginAtZero: true,
+      max: 100,
+      min: -50,
+      grid: {
+        display: false,
+      },
+      ticks: {
+        display: false
+      }
+
+    }
+  }
+
+}
+});
+
+
+
+
+
+
+// Chart 6
+const ctx6 = document.getElementById('chart6');
+output2 = new Chart(ctx6, {
+  type: 'line',
+  data: {
+    labels: Array.from({length: total_no_of_trials}, (_, i) => i + 1),
+    datasets: [{
+      data: output2_data,
+      fill: false,
+      backgroundColor: ["#50B2C0"],
+      tension: 0.4,
+      borderWidth: 1,
+      pointHitRadius: 25 
+    }]
+  },
+  options: {
+    plugins: {
+      tooltip: {
+        enabled: tooltips
+      },
+      annotation: {
+        annotations: {
+          line1: {
+            type: 'line',
+            yMin: 8,
+            yMax: 8,
+            borderColor: 'transparent',
+          }
+        }
+      },
+      title: {
+        display: true,
+        text: "Z",
+        font: {size: 24}
+      },
+      legend: {
+       display: false
+     },  
+   },
+   scales: {
+    y: {
+      beginAtZero: true,
+      max: 100,
+      min: -50,
+      grid: {
+        display: false,
+      },
+      ticks: {
+        display: false
+      }
+
+    }
+  }
+
+}
+});
+
+
+
+
+}
+}
+
+var new_block = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: "<h2>Training Phase</h2>Try to learn the relationships between the inputs and outputs.",
+  margin_vertical: "70px",
+  choices: ["Continue"],
+  on_load: function(){
+
+    total_no_of_trials= 20;
+    input1_data = jsPsych.randomization.repeat([1], total_no_of_trials);
+    input2_data = jsPsych.randomization.repeat([1], total_no_of_trials);
+    input3_data = jsPsych.randomization.repeat([1], total_no_of_trials);
+    output1_data = [20]
+    output2_data = [30]
+    output3_data = [10]
+  }
+}
+
+
+
+if(condition == "CR"){
+  var block = {
+    timeline: [input_trial, conf_rating],
+    repetitions: 20
+  }
+}
+
+if(condition == "NoCR"){
+  var block = {
+    timeline: [input_trial, feedback],
+    repetitions: 20
+  }
+}
+
+
+// Knowledge Test
+
+
+var know_test = {
+  timeline: [
+  {
+    type: jsPsychInstructions,
+    pages: ['<h2>Test Phase</h2>Now you will answer some questions about the relationships between the inputs and the outputs.'],
+    show_clickable_nav: true,
+    allow_backward: false
+  },
+  {type: jsPsychHtmlButtonResponse,
+  stimulus: '<img style = "height: 600px;" src = "img/AX.png"></img>',
+  margin_vertical: "20px",
+  choices: ['Positive', 'Negative', 'No relationship'],
+  prompt: "<b>What was the relationship between input A and output X?</b>",
+  on_finish: function(data){if(data.response == 0){data.accuracy = 1} else(data.accuracy = 0)}
+},
+{type: jsPsychHtmlButtonResponse,
+stimulus: '<img style = "height: 600px;" src = "img/AY.png"></img>',
+margin_vertical: "20px",
+choices: ['Positive', 'Negative', 'No relationship'],
+prompt: "<b>What was the relationship between input A and output Y?</b>",
+on_finish: function(data){if(data.response == 0){data.accuracy = 1} else(data.accuracy = 0)}
+},
+{type: jsPsychHtmlButtonResponse,
+stimulus: '<img style = "height: 600px;" src = "img/AZ.png"></img>',
+margin_vertical: "20px",
+choices: ['Positive', 'Negative', 'No relationship'],
+prompt: "<b>What was the relationship between input A and output Z?</b>",
+on_finish: function(data){if(data.response == 2){data.accuracy = 1} else(data.accuracy = 0)}
+},
+{type: jsPsychHtmlButtonResponse,
+stimulus: '<img style = "height: 600px;" src = "img/BX.png"></img>',
+margin_vertical: "20px",
+choices: ['Positive', 'Negative', 'No relationship'],
+prompt: "<b>What was the relationship between input B and output X?</b>",
+on_finish: function(data){if(data.response == 0){data.accuracy = 1} else(data.accuracy = 0)}
+},
+{type: jsPsychHtmlButtonResponse,
+stimulus: '<img style = "height: 600px;" src = "img/BY.png"></img>',
+margin_vertical: "20px",
+choices: ['Positive', 'Negative', 'No relationship'],
+prompt: "<b>What was the relationship between input B and output Y?</b>",
+on_finish: function(data){if(data.response == 2){data.accuracy = 1} else(data.accuracy = 0)}
+},
+{type: jsPsychHtmlButtonResponse,
+stimulus: '<img style = "height: 600px;" src = "img/empty.png"></img>',
+margin_vertical: "20px",
+choices: ['Positive', 'Negative', 'No relationship'],
+prompt: "<b>To show you're paying attention, select 'Negative' above</b>"
+
+},
+{type: jsPsychHtmlButtonResponse,
+stimulus: '<img style = "height: 600px;" src = "img/BZ.png"></img>',
+margin_vertical: "20px",
+choices: ['Positive', 'Negative', 'No relationship'],
+prompt: "<b>What was the relationship between input B and output Z?</b>",
+on_finish: function(data){if(data.response == 2){data.accuracy = 1} else(data.accuracy = 0)}
+},
+{type: jsPsychHtmlButtonResponse,
+stimulus: '<img style = "height: 600px;" src = "img/CX.png"></img>',
+margin_vertical: "20px",
+choices: ['Positive', 'Negative', 'No relationship'],
+prompt: "<b>What was the relationship between input C and output X?</b>",
+on_finish: function(data){if(data.response == 2){data.accuracy = 1} else(data.accuracy = 0)}
+},
+{type: jsPsychHtmlButtonResponse,
+stimulus: '<img style = "height: 600px;" src = "img/CY.png"></img>',
+margin_vertical: "20px",
+choices: ['Positive', 'Negative', 'No relationship'],
+prompt: "<b>What was the relationship between input C and output Y?</b>",
+on_finish: function(data){if(data.response == 2){data.accuracy = 1} else(data.accuracy = 0)}
+},
+{type: jsPsychHtmlButtonResponse,
+stimulus: '<img style = "height: 600px;" src = "img/CZ.png"></img>',
+margin_vertical: "20px",
+choices: ['Positive', 'Negative', 'No relationship'],
+prompt: "<b>What was the relationship between input C and output Z?</b>",
+on_finish: function(data){if(data.response == 1){data.accuracy = 1} else(data.accuracy = 0)}
+}
+]
+};
+
+
+// Instructions
+
+var instructions = {
+  type: jsPsychInstructions,
+  pages: ['<h1>Instructions</h1><p>In this task you will learn about the relationships between different variables.<br>In the system, there are three inputs (A, B, C) that you can control and three outputs that result from these inputs (X,Y,Z).</p><img style = "height:600px;width:1200px;"src = "img/empty.png"></img>',
+    'Your job is to first explore the system to try and learn the relationships between the inputs and the outputs. After this we will will ask you some questions about the relationships',
+    'To change the inputs, you will use your mouse to slide them up or down. Once all three have been set you can hit the "Simulate" button. The outputs will then change allowing you to see the effect that the inputs had on the outputs.<img style = "height:600px;width:1200px;"src = "img/example.png"></img>',
+    'You will have 20 trials to explore the system'
+
+
+
+    ],
+  show_clickable_nav: true,
+  allow_backward: false
+
+}
+
+
+var preload = {
+  type: jsPsychPreload,
+  images: ['img/AX.png','img/AY.png','img/AZ.png','img/BX.png','img/BY.png','img/BZ.png','img/CX.png','img/CY.png','img/CZ.png','img/example.png','img/empty.png']
+}
+
+
+
+var debug = {
+  type: jsPsychSurveyText,
+  questions: [
+    {prompt: 'Did you experience any issues while completing this study?', rows: 5}
+    ]
+}
+
+
+
+
+var participant_info_paid = {
+  timeline: [{
+    type: jsPsychInstructions,
+    pages: [
+      '<div  style="text-align: left;"><img style = "height: 100px; float: right" src= "img/logo.png"></img><h1>Participant Information Statement</h1><h1 style = "color:#e1310e">Research Study: Metacognition and Cognitive Performance</h1>Dr Kit Double (Responsible Researcher)<br>School of Psychology, Faculty of Science<br>Phone: +61 2 8627 8636| Email: kit.double@sydney.edu.au</div><hr><div style="text-align: left;"><h4 style = "color:#e1310e">1.  What is this study about?</h2>We are conducting a research study about how people monitor and control their cognitive performance. This will help us understand how people adapt, monitor and respond during cognitive tasks. Taking part in this study is voluntary. <br><br>Please read this sheet carefully and ask questions about anything that you don&#39;t understand or want to know more about.<h4 style = "color:#e1310e">2. Who is running the study?</h2>The study is being carried out by the following researchers:<br><br><li>  Dr Kit Double, Research Fellow, School of Psychology, University of Sydney<br><br>This study is being funded by the Australian Research Council Discovery Program (DE230101223). </li><div style="text-align: left;"><h4 style = "color:#e1310e">3. What will the study involve for me?</h2>If you decide to take part in this study, you will be asked to complete several computerised cognitive tasks and answer a number of surveys about yourself. <br><br>The study will take approximately 10 minutes to complete. The study will be completed online.<h4 style = "color:#e1310e">4. Can I withdraw once I&#39;ve started?</h2>By participating in this study, you are providing your consent for us to collect information about you. Being in this study is completely voluntary and you do not have to take part. Your decision will not affect your current or future relationship with the researchers or anyone else at The University of Sydney.<br><br>You can withdraw by closing the study website on your computer. If you decide to withdraw, we will not collect any more information from you. Any information that we have already collected will be kept in our study records and may be included in the study results. If you would prefer that we remove information that we have already collected from you, please contact Dr Kit Double (kit.double@sydney.edu.au). If you do not submit a completed response you will not receive any compensation.<h4 style = "color:#e1310e">5.  Are there any risks or costs?</h2>Aside from giving up your time, we do not expect that there will be any risks or costs associated with taking part in this study. <h4 style = "color:#e1310e">6.  Are there any benefits?</h2>The study will take approximately 10 minutes and you will receive &pound;1 compensation for completion. If you do not submit a completed response you will not receive any compensation.<h4 style = "color:#e1310e">7.  What will happen to information that is collected?</h2>By participating in this study, you are providing your consent for us to collect information about you for the purposes of this study.<br><br> Any information you provide us will be stored securely and we will only disclose it with your permission, unless we are required by law to release information. We are planning for the study findings to be published. You will not be individually identifiable in these publications.<br><br>We will keep the information we collect for this study, and we may use it in future projects.<br><br> By providing your consent you are allowing us to use your information in future projects. We don&#39;t know at this stage what these other projects will involve. We will seek ethical approval before using the information in these future projects.<br><br>We intend to submit the information from this project to a public database for research information, so that other researchers can access it and use it in their projects. Before we do so, we will take out all the identifying information so that the people we give it to won&#39;t know whose information it is. They won&#39;t know that you participated in the study and they won&#39;t be able to link you to any of the information you provided.<h4 style = "color:#e1310e">8. Will I be told the results of the study?</h2>You have a right to receive feedback about the overall results of this study. To receive feedback about the overall results of the study please email Dr Kit Double (<a href="mailto:kit.double@sydney.edu.au">kit.double@sydney.edu.au</a>). This feedback will be in the form of a brief lay summary. <h4 style = "color:#e1310e">9. What if I would like further information?</h2>When you have read this information, the following researcher/s will be available to discuss it with you further and answer any questions you may have: <br><br><li>Dr Kit Double, Research Fellow, School of Psychology, University of Sydney. Phone: +61 2 8627 8636| Email: kit.double@sydney.edu.au </li><h4 style = "color:#e1310e">10.  What if I have a complaint or any concerns?</h2>The ethical aspects of this study have been approved by the Human Research Ethics Committee (HREC) of The University of Sydney [2022/796] according to the National Statement on Ethical Conduct in Human Research (2007). If you are concerned about the way this study is being conducted or you wish to make a complaint to someone independent from the study, please contact the University:<br><br>Human Ethics Manager<br>human.ethics@sydney.edu.au<br>+61 2 8627 8176<br><button onclick="window.print();return false;" />Print</button><h4 style = "color:#e1310e; text-align: center;">This information sheet is for you to keep</h3></div><div style="text-align: center;">'
+      ],
+show_clickable_nav: true,
+button_label_next: "Start",
+allow_backward: false
+}]
+}
+
+
+
+  // Run the timeline
+jsPsych.run([preload, participant_info_paid, welcome, demographics, instructions, new_block, block, know_test, debug, save_data]);
+
+
+
+
+
+</script>
+</html>
