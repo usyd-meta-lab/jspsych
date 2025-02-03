@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>USYD Metacognition</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Load jsPsych and jquery-->
+  <script src="https://unpkg.com/jspsych@7.3.3"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/js/foundation.min.js'></script>
+  <link href="https://unpkg.com/jspsych@7.2.3/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <link href="https://unpkg.com/jquery-ui-css@1.11.5/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+
+
+
+  <!-- Load jsPsych plugins-->
+  <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-external-html@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-external-html@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-browser-check@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-call-function"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.2.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-html-form@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+
+  <!-- Load the global environment-->
+  <script src="global-env.js"></script>
+  <script src="info_sheets.js"></script>
+  
+
+  <!-- Some custom CSS-->
+  <link href="custom-css.css" rel="stylesheet" type="text/css" />
+
+</head>
+<body></body>
+<script>
+
+
+
+//////////////////////////////////
+//         Gloabl Settings      //
+//////////////////////////////////
+
+// Initalise jsPsych
+  const jsPsych = initJsPsych({
+   on_interaction_data_update: function(data) {
+     if(data.event == 'fullscreenexit' & pilot != 'true'){in_fullscreen = false}
+
+   },
+ on_finish: function(data) {
+   if(aborted == true){alert("You must use Chrome or Firefox to complete this experiment.")}
+     if(aborted == false) {  if(jsPsych.data.get().filter({trial_type: "Summary Trial"}).select('correct').mean() < 0.55){window.location = attention_redirect_link} else {window.location = redirect_link}}
+    //jsPsych.data.get().localSave('csv','mydata.csv');
+   }
+})
+
+
+// Settings (set these)
+
+  const DataPipe_ID = "8OfsyyO8eYmR" // The DataPipe ID for where the data should be stored
+
+  const sona_experiment_id = "NA"; // The SONA experiment ID 
+  const sona_credit_token = "NA"; // The SONA credit token 
+  const Prolific_redirect = "CHGWKNI0"; // The Prolific redirect link (to credit)
+  const Prolific_failed_check = "CHGWKNI0"; // The Prolific redirect link to NOT credit (manual review)
+  const task_time = 5; // time in minutes for the PIS 
+
+
+// Global parameters (might need to change)
+  const staircase_on = false; // Turn on/off staircasing 
+  var ratings_on = null; // Turn on/off confidence ratings 
+  const random_diff = false; // If true and the staircase is off then a spread of dots between 1 and 70 will be used
+  const rating_type = 'text' // Should be slider or text
+
+  var no_trials = 30; // number of trials in each block
+
+
+  var in_fullscreen = true;
+  var trialnum = 1;
+  var blocknum = 1;
+  aborted = false;
+  phase = null;
+
+  jsPsych.data.addProperties({staircase_on: staircase_on});
+  jsPsych.data.addProperties({ratings_on: ratings_on});
+  jsPsych.data.addProperties({version: "Age"});
+
+//////////////////////////////////
+
+
+
+
+// Preload
+
+
+  var preload = {
+    type: jsPsychPreload,
+    images: [
+     'paintings/DP-17152-001.jpg',
+     'paintings/DP105661.jpg',
+     'paintings/DP-17608-001.jpg',
+     'paintings/DP145411.jpg',
+     'paintings/DT6545.jpg',
+     'paintings/DP-12413-001.jpg',
+     'paintings/DP-18296-037.jpg',
+     'paintings/DT1138.jpg',
+     'paintings/DP145407.jpg',
+     'paintings/DP121326.jpg',
+     'paintings/DP146454.jpg',
+     'paintings/DP-17778-001.jpg',
+     'paintings/DP-15282-001.jpg',
+     'paintings/ep51.5.bw.R.jpg',
+     'paintings/DT7692.jpg',
+     'paintings/DP-687-001.jpg',
+     'paintings/DP169396.jpg',
+     'paintings/DT503.jpg',
+     'paintings/DP145899.jpg',
+     'paintings/DP145927.jpg',
+     'paintings/DP-17060-001.jpg',
+     'paintings/DP146479.jpg',
+     'paintings/DP145399.jpg',
+     'paintings/DP-16969-001.jpg',
+     'paintings/DP-18371-001.jpg',
+     'paintings/DP145922.jpg',
+     'paintings/DP143176.jpg',
+     'paintings/DP317722.jpg',
+     'paintings/DP147901.jpg',
+     'paintings/DP143152.jpg',
+     'paintings/DP-17462-001.jpg',
+     'paintings/DP145943.jpg',
+     'paintings/DP-30758-001.jpg',
+     'paintings/DP-27911-001.jpg',
+     'paintings/DP366472.jpg',
+     'paintings/DP143177.jpg',
+     'paintings/DP145932.jpg',
+     'paintings/DP-16323-001.jpg',
+     'paintings/DP146447.jpg',
+     'paintings/DT202022.jpg',
+     'paintings/DP145403.jpg',
+     'paintings/DP-22842-001.jpg',
+     'paintings/DP143156.jpg',
+     'paintings/DP-32674-001.jpg',
+     'paintings/DP145930.jpg',
+     'paintings/DP-24117-001.jpg',
+     'paintings/DP-26939-001.jpg',
+     'paintings/DT53.jpg',
+     'paintings/DP159333.jpg',
+     'paintings/DP-22706-001.jpg',
+     'paintings/DP164826.jpg',
+     'paintings/DP168992.jpg',
+     'paintings/DP-22532-001.jpg',
+     'paintings/DP145896.jpg',
+     'paintings/DP298061.jpg',
+     'paintings/DP124057.jpg',
+     'paintings/DP123846.jpg',
+     'paintings/DP214443.jpg',
+     'paintings/DP168995.jpg',
+     'paintings/Wrightsman21.jpg',
+     'paintings/DP141202.jpg',
+     'paintings/DT8872.jpg',
+     'paintings/DP356142.jpg',
+     'paintings/ap16.68.3.jpg',
+     'paintings/DP324044.jpg',
+     'paintings/DP-24221-001.jpg',
+     'paintings/DP-31219-001.jpg',
+     'paintings/ap1970.283.3.jpg',
+     'paintings/DP-19779-001.jpg',
+     'paintings/DP259119.jpg',
+     'paintings/DT58.jpg',
+     'paintings/DP264503.jpg',
+     'paintings/DP169392.jpg',
+     'paintings/ap06.179.jpg',
+     'paintings/DP-13041-001.jpg',
+     'paintings/DP162171.jpg',
+     'paintings/DP-19709-001.jpg',
+     'paintings/DT11657.jpg',
+     'paintings/DP320086.jpg',
+     'paintings/DP169218.jpg',
+     'paintings/DP-28009-001.jpg',
+     'paintings/DT2042.jpg',
+     'paintings/DP-26884-001.jpg',
+     'paintings/DT11172.jpg',
+     'paintings/ap1972.191.jpg',
+     'paintings/DT233622.jpg',
+     'paintings/ap59.68.jpg',
+     'paintings/ap14.126.3.jpg',
+     'paintings/ap63.36.jpg',
+     'paintings/DT275484.jpg',
+     'paintings/ap24.186.jpg',
+     'paintings/DT12075.jpg',
+     'paintings/ap12.64.jpg',
+     'paintings/APS224.jpg',
+     'paintings/DT862.jpg',
+     'paintings/DT2076.jpg',
+     'paintings/ap10.106.jpg',
+     'paintings/DT1549.jpg',
+     'paintings/ap87.15.78.jpg',
+     'paintings/ap74.27.jpg',
+     'paintings/DP141217.jpg',
+     'paintings/ap21.115.2.jpg',
+     'paintings/DT11964.jpg',
+     'paintings/ap98.14.jpg',
+     'paintings/DP318075(a).jpg',
+     'paintings/DT2061.jpg',
+     'paintings/ap93.20.jpg',
+     'paintings/DT202891.jpg',
+     'paintings/ap32.73.1.jpg',
+     'paintings/DP-19024-001.jpg',
+     'paintings/ap07.111.jpg',
+     'paintings/DT379.jpg',
+     'paintings/ap10.153.jpg',
+     'paintings/DP224363.jpg',
+     'paintings/DP273005.jpg',
+     'paintings/DP161216.jpg',
+     'paintings/DT6415.jpg',
+     'paintings/CT_2860.jpg',
+     'paintings/DP-13011-001.jpg',
+     'paintings/43.47.7 - color.jpg'
+     ]
+  }
+
+
+
+  // Browser Check
+
+
+  var browser_check = {
+    timeline: [
+    {  
+      type: jsPsychBrowserCheck,
+      inclusion_function: (data) => {
+        return ['chrome', 'firefox'].includes(data.browser) && data.mobile === false;
+      },
+      exclusion_message: (data) => {
+        aborted = true;
+        if(data.mobile){
+          return '<p style = "color: black;">You must use a desktop/laptop computer to participate in this experiment.</p>';
+        } else if(data.browser !== 'chrome'){
+          return '<p style = "color: black;">You must use Chrome or Firefox as your browser to complete this experiment.</p>'
+        }
+      },
+    }
+    ],
+    conditional_function: function(){
+      if(pilot === 'true'){
+        return false;
+      } else {
+        return true;
+      }
+    }}
+
+
+
+// Enter Fullscreen
+
+    var enter_fullscreen = {
+      timeline: [
+        {type: jsPsychFullscreen,
+        message: '<p style = "color: black;">To take part in the experiment, your browser must be in fullscreen mode. Exiting fullscreen mode will pause the experiment. <br></br>Please click the button below to enable fullscreen mode and continue.</p>',
+        fullscreen_mode: true,
+        on_finish: function(){
+          in_fullscreen = true;
+        }
+      }
+      ],
+      conditional_function: function(){
+        if(pilot === 'true'){
+          return false;
+        } else {
+          return true;
+        }
+      }
+    }
+
+
+
+
+// Instructions
+
+
+  var instructions = {
+    type: jsPsychInstructions,
+              on_load: function(){
+          document.body.style.backgroundColor = 'black'
+      },
+    pages: [
+      '<p class="instructions">Welcome to the task!</p>' +
+        '<p class="instructions">In this task, we will ask you to judge how old each of a series of paintings is.</p>' +
+        '<p class="instructions">You will rate each painting based on when you think it was painted. All paintings were painted between the year 1500 to the year 2000.</p>' 
+      ],
+     show_clickable_nav: true
+   }
+
+
+
+
+
+
+
+
+/////////////// **********  A TRIAL  ***************************** ///////////////
+
+
+
+
+    var a_trial = {
+      data: function(){
+        return {trialnum: trialnum}
+      },
+      timeline: [
+
+
+// New Block
+      {
+        timeline: [
+        {
+          type: jsPsychInstructions,
+          pages: function(){
+           blocknumber = ((trialnum-1)/60) + 1;
+           return [
+            '<p>Block ' + blocknumber + '</p>' +
+            '<p>When you are ready to begin the block, please click "Next"</p>'
+            ]
+         },
+         show_clickable_nav: true
+       }
+
+       ],
+        conditional_function: function(){
+          if(trialnum === 1 | trialnum === 61){
+            return true;
+          } else {
+            return false;
+          }
+        }
+      },
+
+// Check Fullscreen
+      {
+        timeline: [
+
+          {type: jsPsychFullscreen,
+          message: '<p>You need to be in fullscreen mode to continue the experiment! <br></br> Please click the button below to enter fullscreen mode.<br></br><p>',
+          fullscreen_mode: true,
+          on_finish(){
+            in_fullscreen = true;
+          }
+        }
+        ],
+        conditional_function: function(){
+          if(in_fullscreen === true){
+            return false;
+          } else {
+            return true;
+          }
+        }
+      },
+
+// Fixation
+      {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<p id = "fixation" style = "color: white; font-size: 70px">+</p>',
+        choices: 'NO_KEYS',
+        trial_duration: 500,
+        on_finish: function(data){
+          data.trial_type = "Fixation";
+          document.body.style.backgroundColor = 'black'
+        }
+      },
+
+
+
+// Response
+
+
+      {
+        type: jsPsychHtmlSliderResponse,
+        stimulus: function(){
+          return ('<img src="paintings/'+ jsPsych.timelineVariable('stim_image')+'" style="max-width:800px; max-height:600px;">' +
+           "<h3 style = 'color: white;'>When was this painted?</h3>" +
+           '<div id = "conf1" class = "conf" style = "position: absolute; height: 25px; background-color: transparent; width: 795px; margin-top: 4px; margin-left: 0px; border-left: 5px solid white; border-right: 5px solid white; "></div>' +
+           '<div id = "conf1" class = "conf" style = "position: absolute; height: 25px; background-color: transparent; width: 400px; margin-top: 4px; margin-left: 0px; border-right: 5px solid white; "></div>')
+        },
+        min: 1,
+        max: 21,
+        step: 1,
+        slider_start: 11,
+        slider_width: 800,
+        require_movement: true,
+        labels: ['<p style = "color: white; font-size: 15pt;">1500</p>',  '<p style = "color: white; font-size: 15pt;">1750</p>', '<p style = "color: white; font-size: 15pt;">2000</p>'],
+        button_label: "Submit",
+        on_finish: function(data){
+          data.trial_type = "Stimulus Response";
+
+        },
+        css_classes: ["conf_rating"]
+
+      },
+
+
+
+
+// Text CR
+
+      {
+        timeline: [
+
+        {
+          type: jsPsychSurveyText,
+          on_load: function(){
+            $('#jspsych-content').css('padding', '200');
+            $('#jspsych-content').css('background', '#ccc');
+            
+          },
+          on_finish: function(data){
+            data.trial_type = "Confidence Rating";
+            $('#jspsych-content').css('padding', '0');
+            $('#jspsych-content').css('background', 'black');
+          },
+          questions: [
+            {prompt: "<h3 style = 'color: black;'>How confident are you in your last response?</h3><p style = 'color: black;'>Enter a number between 0 (not at all confident) and 100 (totally confident)</p>", required: true, columns: 1}
+            ]
+        }
+
+        ],
+        conditional_function: function(){
+          if(rating_type == "text" & ratings_on === true){
+            return true;
+          } else {
+            return false;
+          }
+        }
+      },
+
+
+// Confidence Rating
+      {
+        timeline: [
+
+        {
+          type: jsPsychHtmlSliderResponse,
+          stimulus: function(data){ 
+
+            response = Number(jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last().values()[0].response);
+            response = response - 11;
+            return ("<h3 style = 'color: white;'>How confident are you in your last response?</h3>" +
+             '<div id = "conf1" class = "conf" style = "position: absolute; height: 25px; background-color: transparent; width: 795px; margin-top: 4px; margin-left: 0px; border-left: 5px solid white; border-right: 5px solid white; "></div>')
+          },
+          slider_width: 800,
+          require_movement: true,
+          labels: ['<p style = "color: white; font-size: 15pt;">Not at all</p>', "", "", "", "", '<p style = "color: white; font-size: 15pt;">Totally</p>'],
+          button_label: "Submit",
+          on_finish: function(data){
+            data.trial_type = "Confidence Rating";
+
+          },
+          css_classes: ["conf_rating"]
+
+        }
+
+        ],
+        conditional_function: function(){
+          if(rating_type == "slider" & ratings_on === true){
+            return true;
+          } else {
+            return false;
+          }
+        }
+      },
+
+
+
+
+// Summary trial to store all the data typically required (nothing is displayed to the particpant) and do the staircasing
+      {
+        type: jsPsychCallFunction,
+        func: function(data){
+
+          accuracy = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).select('correct').values;
+          accuracy = accuracy.slice(Math.max(accuracy.length - 2, 0))
+
+          if(staircase_on == true){
+            stairs = staircase(dots_diff, accuracy, trialnum);
+
+            dots_diff = stairs.diff;
+
+          }
+
+        },
+        on_finish: function(data){
+
+          data.rt = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last().values()[0].rt;
+          data.phase = phase;
+          data.response = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last().values()[0].response;
+          data.correct = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last().values()[0].correct;
+          data.stim_image = jsPsych.timelineVariable('stim_image');
+          if(ratings_on == true){
+            data.confidence = jsPsych.data.get().filter({trial_type: "Confidence Rating"}).last().values()[0].response;
+
+          } 
+
+
+          data.trial_type = "Summary Trial"
+          trialnum++;
+
+        }
+      },
+
+
+
+      ],
+timeline_variables: [
+  {stim_image: 'DP-17152-001.jpg'},
+  {stim_image: 'DP105661.jpg'},
+  {stim_image: 'DP-17608-001.jpg'},
+  {stim_image: 'DP145411.jpg'},
+  {stim_image: 'DT6545.jpg'},
+  {stim_image: 'DP-12413-001.jpg'},
+  {stim_image: 'DP-18296-037.jpg'},
+  {stim_image: 'DT1138.jpg'},
+  {stim_image: 'DP145407.jpg'},
+  {stim_image: 'DP121326.jpg'},
+  {stim_image: 'DP146454.jpg'},
+  {stim_image: 'DP-17778-001.jpg'},
+  {stim_image: 'DP-15282-001.jpg'},
+  {stim_image: 'ep51.5.bw.R.jpg'},
+  {stim_image: 'DT7692.jpg'},
+  {stim_image: 'DP-687-001.jpg'},
+  {stim_image: 'DP169396.jpg'},
+  {stim_image: 'DT503.jpg'},
+  {stim_image: 'DP145899.jpg'},
+  {stim_image: 'DP145927.jpg'},
+  {stim_image: 'DP-17060-001.jpg'},
+  {stim_image: 'DP146479.jpg'},
+  {stim_image: 'DP145399.jpg'},
+  {stim_image: 'DP-16969-001.jpg'},
+  {stim_image: 'DP-18371-001.jpg'},
+  {stim_image: 'DP145922.jpg'},
+  {stim_image: 'DP143176.jpg'},
+  {stim_image: 'DP317722.jpg'},
+  {stim_image: 'DP147901.jpg'},
+  {stim_image: 'DP143152.jpg'},
+  {stim_image: 'DP-17462-001.jpg'},
+  {stim_image: 'DP145943.jpg'},
+  {stim_image: 'DP-30758-001.jpg'},
+  {stim_image: 'DP-27911-001.jpg'},
+  {stim_image: 'DP366472.jpg'},
+  {stim_image: 'DP143177.jpg'},
+  {stim_image: 'DP145932.jpg'},
+  {stim_image: 'DP-16323-001.jpg'},
+  {stim_image: 'DP146447.jpg'},
+  {stim_image: 'DT202022.jpg'},
+  {stim_image: 'DP145403.jpg'},
+  {stim_image: 'DP-22842-001.jpg'},
+  {stim_image: 'DP143156.jpg'},
+  {stim_image: 'DP-32674-001.jpg'},
+  {stim_image: 'DP145930.jpg'},
+  {stim_image: 'DP-24117-001.jpg'},
+  {stim_image: 'DP-26939-001.jpg'},
+  {stim_image: 'DT53.jpg'},
+  {stim_image: 'DP159333.jpg'},
+  {stim_image: 'DP-22706-001.jpg'},
+  {stim_image: 'DP164826.jpg'},
+  {stim_image: 'DP168992.jpg'},
+  {stim_image: 'DP-22532-001.jpg'},
+  {stim_image: 'DP145896.jpg'},
+  {stim_image: 'DP298061.jpg'},
+  {stim_image: 'DP124057.jpg'},
+  {stim_image: 'DP123846.jpg'},
+  {stim_image: 'DP214443.jpg'},
+  {stim_image: 'DP168995.jpg'},
+  {stim_image: 'Wrightsman21.jpg'},
+  {stim_image: 'DP141202.jpg'},
+  {stim_image: 'DT8872.jpg'},
+  {stim_image: 'DP356142.jpg'},
+  {stim_image: 'ap16.68.3.jpg'},
+  {stim_image: 'DP324044.jpg'},
+  {stim_image: 'DP-24221-001.jpg'},
+  {stim_image: 'DP-31219-001.jpg'},
+  {stim_image: 'ap1970.283.3.jpg'},
+  {stim_image: 'DP-19779-001.jpg'},
+  {stim_image: 'DP259119.jpg'},
+  {stim_image: 'DT58.jpg'},
+  {stim_image: 'DP264503.jpg'},
+  {stim_image: 'DP169392.jpg'},
+  {stim_image: 'ap06.179.jpg'},
+  {stim_image: 'DP-13041-001.jpg'},
+  {stim_image: 'DP162171.jpg'},
+  {stim_image: 'DP-19709-001.jpg'},
+  {stim_image: 'DT11657.jpg'},
+  {stim_image: 'DP320086.jpg'},
+  {stim_image: 'DP169218.jpg'},
+  {stim_image: 'DP-28009-001.jpg'},
+  {stim_image: 'DT2042.jpg'},
+  {stim_image: 'DP-26884-001.jpg'},
+  {stim_image: 'DT11172.jpg'},
+  {stim_image: 'ap1972.191.jpg'},
+  {stim_image: 'DT233622.jpg'},
+  {stim_image: 'ap59.68.jpg'},
+  {stim_image: 'ap14.126.3.jpg'},
+  {stim_image: 'ap63.36.jpg'},
+  {stim_image: 'DT275484.jpg'},
+  {stim_image: 'ap24.186.jpg'},
+  {stim_image: 'DT12075.jpg'},
+  {stim_image: 'ap12.64.jpg'},
+  {stim_image: 'APS224.jpg'},
+  {stim_image: 'DT862.jpg'},
+  {stim_image: 'DT2076.jpg'},
+  {stim_image: 'ap10.106.jpg'},
+  {stim_image: 'DT1549.jpg'},
+  {stim_image: 'ap87.15.78.jpg'},
+  {stim_image: 'ap74.27.jpg'},
+  {stim_image: 'DP141217.jpg'},
+  {stim_image: 'ap21.115.2.jpg'},
+  {stim_image: 'DT11964.jpg'},
+  {stim_image: 'ap98.14.jpg'},
+  {stim_image: 'DP318075(a).jpg'},
+  {stim_image: 'DT2061.jpg'},
+  {stim_image: 'ap93.20.jpg'},
+  {stim_image: 'DT202891.jpg'},
+  {stim_image: 'ap32.73.1.jpg'},
+  {stim_image: 'DP-19024-001.jpg'},
+  {stim_image: 'ap07.111.jpg'},
+  {stim_image: 'DT379.jpg'},
+  {stim_image: 'ap10.153.jpg'},
+  {stim_image: 'DP224363.jpg'},
+  {stim_image: 'DP273005.jpg'},
+  {stim_image: 'DP161216.jpg'},
+  {stim_image: 'DT6415.jpg'},
+  {stim_image: 'CT_2860.jpg'},
+  {stim_image: 'DP-13011-001.jpg'},
+  {stim_image: '43.47.7 - color.jpg'}
+
+  ],
+sample: {
+        type: 'without-replacement',
+        size: no_trials
+    }
+};
+
+
+
+
+
+
+
+var debug = {
+  type: jsPsychSurveyText,
+  questions: [
+    {prompt: 'Did you experience any issues while completing this study?', rows: 5}
+    ]
+}
+
+
+
+  // Blocks
+
+
+const test_block = {
+  timeline: [a_trial],
+  on_timeline_start: function(){
+    provide_feedback = false; 
+    phase = "Test";
+  }
+}
+
+
+
+
+
+
+
+
+// Save data and redirect [shouldn't need to edit below]
+
+
+
+
+
+// Capture any url paramaters
+const PROLIFIC_PID = jsPsych.data.getURLVariable('PROLIFIC_PID');
+const SONAID = jsPsych.data.getURLVariable('SONAID');
+const pilot = jsPsych.data.getURLVariable('pilot');
+
+
+// Redirect based on SONA vs Prolific
+
+    // SONA
+if(typeof SONAID != 'undefined'){
+
+  jsPsych.data.addProperties({participant_id: SONAID});
+  jsPsych.data.addProperties({Source: "SONA"});
+
+  redirect_link = "https://sydneypsych.sona-systems.com/webstudy_credit.aspx?experiment_id="+sona_experiment_id+"&credit_token="+sona_credit_token+"&survey_code=" + SONAID + "&id=" + SONAID;
+    attention_redirect_link = "https://sydney.au1.qualtrics.com/jfe/form/SV_3h2qh8pBAnv00QK?SONAID=" + SONAID + "accuracy=" + jsPsych.data.get().filter({trial_type: "Summary Trial"}).select('correct').mean(); // A seperate link for those who fail the attention check
+
+
+  }
+
+    // PROLIFIC
+  if(typeof SONAID === 'undefined'){
+
+    jsPsych.data.addProperties({participant_id: PROLIFIC_PID});
+    jsPsych.data.addProperties({Source: "Prolific"});
+
+    redirect_link ="https://app.prolific.com/submissions/complete?cc=" + Prolific_redirect;
+    attention_redirect_link ="https://app.prolific.co/submissions/complete?cc=" + Prolific_failed_check; // A seperate link for those who fail the attention check
+  }
+
+
+
+
+  // Save to OSF
+  const subject_id = jsPsych.randomization.randomID(10);
+  const filename = `${subject_id}.csv`;
+
+
+
+  const save_data = {
+    type: jsPsychPipe,
+    action: "save",
+    experiment_id: DataPipe_ID,
+    filename: filename,
+    data_string: ()=>jsPsych.data.get().csv()
+  };
+
+
+
+// Create Experiment
+//browser_check, enter_fullscreen, participant_info_paid, participant_info_SONA, demographics, instructions,
+  condition_1_timeline = [browser_check, preload, enter_fullscreen, participant_info_paid, participant_info_SONA, demographics, instructions, test_block, debug, save_data, DEBRIEF_SONA ];
+
+  async function createExperiment(){
+    const condition = await jsPsychPipe.getCondition(DataPipe_ID);
+    jsPsych.data.addProperties({condition: condition});
+    if(condition == 0) { timeline = condition_1_timeline; ratings_on = false}
+    if(condition == 1) { timeline = condition_1_timeline; ratings_on = true}
+    jsPsych.run(timeline);
+  }
+
+
+
+
+  createExperiment();
+
+
+</script>
+</html>
