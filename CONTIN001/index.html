@@ -608,9 +608,9 @@ if(typeof SONAID != 'undefined'){
     /////////////// **********  Condition Assignment  ***************************** ///////////////
     const condition = await jsPsychPipe.getCondition(DataPipe_ID);
     jsPsych.data.addProperties({condition: condition});
-    if(condition == 0) { ratings_on = false; outcome = "Low";}
+    if(condition == 0) { ratings_on = true; outcome = "Low";}
     if(condition == 1) { ratings_on= true; outcome = "Low";}
-    if(condition == 2) { ratings_on = false; outcome = "High";}
+    if(condition == 2) { ratings_on = true; outcome = "High";}
     if(condition == 3) { ratings_on= true; outcome = "High";}
 
     jsPsych.data.addProperties({ratings_on: ratings_on});
