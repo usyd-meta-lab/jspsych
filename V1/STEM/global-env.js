@@ -1,27 +1,10 @@
-  var welcome = {
-    timeline: [
-      {type: jsPsychSurveyText,
-      questions: [{prompt: "Please enter your Prolific ID", name: 'prolificID', required:true}],
-      preamble: "<font size = '15' color='#002080'><b>Welcome to the experiment!</b></font><br><br>",
-      button_label: "Begin",
-      on_finish: function(data){
-        participant_id = data.response.prolificID;
-        jsPsych.data.addProperties({participant_id: participant_id});
-        if(PROLIFIC_PID != undefined){jsPsych.data.addProperties({PROLIFIC_PID: PROLIFIC_PID});};
-      }
-    }
-    ],
-    conditional_function: function(){
-      if(SONA_PID != null){return false}
-    }
-  }
-
-
+  // Legacy demographics
 
     var demographics = {
-      type: jsPsychSurveyHtmlForm,
+       timeline: [
+      {type: jsPsychSurveyHtmlForm,
       preamble: "<font size = '15' color='#002080'>Basic Information</font>",
-      html: '<div style = "text-align: left"><br><p><b> Age: </b><br><input name="age" type="number" min ="18" max = "100" style = "width: 8em;"required></p>' +
+      html: '<div style = "text-align: left"><br><p><b> Age: </b><br><input name="age" type="number" min ="17" max = "100" style = "width: 8em;"required></p>' +
       '<p><b>Sex:</b></p><div><input type="radio" id="male" name="sex" value="male"unchecked><label for="male">Male</label></div><div><input type="radio" id="female" name="sex" value="female"><label for="female">Female</label></div><div><input type="radio" id="other" name="sex" value="other"><label for="other">Non binary/prefer not to say</label></div>' +
       '<p><b>Do you speak english fluently?:</b></p><div><input type="radio" id="yes" name="english" value="yes"unchecked><label for="yes">Yes</label></div><div><input type="radio" id="no" name="english" value="no"><label for="no">No</label></p></div><div></div>',
       on_finish: function(data){
@@ -46,14 +29,17 @@
 
 
       }
-    };
+    }
+    ],
+    conditional_function: function(){
+      if(typeof SONAID != 'undefined') {return true} else {return false}
+    }}
 
 
 
 
 
-
-  // Save to server
+  // Save to server [legacy]
     function saveDataServer(data){
       var xhr = new XMLHttpRequest();
         xhr.open('POST', 'write_data.php'); // 
@@ -78,6 +64,10 @@
         stimulus : "Saving...please wait",
         trial_duration: 4000
       }
+
+
+
+
 
 
 

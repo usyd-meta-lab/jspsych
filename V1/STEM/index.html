@@ -53,17 +53,20 @@
 
 // Initalise jsPsych
   const jsPsych = initJsPsych({
- on_finish: function(data) {
+   on_interaction_data_update: function(data) {
+     if(data.event == 'fullscreenexit' & pilot != 'true'){in_fullscreen = false}
 
-    if(jsPsych.data.get().filter({trial_type: "Summary Trial"}).select('correct').mean() < 0.55){window.location = attention_redirect_link} else {window.location = redirect_link}
+   },
+ on_finish: function(data) {
+   if(aborted == true){alert("You must use Chrome or Firefox to complete this experiment.")}
+     if(aborted == false) {  if(jsPsych.data.get().filter({trial_type: "Summary Trial"}).select('correct').mean() < 0.55){window.location = attention_redirect_link} else {window.location = redirect_link}}
     //jsPsych.data.get().localSave('csv','mydata.csv');
    }
 })
 
-
 // Settings (set these)
 
-  const DataPipe_ID = "F6SV9kzynyli" // The DataPipe ID for where the data should be stored
+  const DataPipe_ID = "bjAI9yw63yXj" // The DataPipe ID for where the data should be stored
 
   const sona_experiment_id = "NA"; // The SONA experiment ID 
   const sona_credit_token = "NA"; // The SONA credit token 
@@ -75,12 +78,67 @@
 // Global parameters (might need to change)
   var trialnum = 1;
   var blocknum = 1;
+  const task_time = 30; // time in minutes for the PIS 
+
 
 
 
 
 //////////////////////////////////
 
+
+
+
+  // Browser Check
+
+
+  var browser_check = {
+    timeline: [
+    {  
+    type: jsPsychBrowserCheck,
+    inclusion_function: (data) => {
+      return ['chrome', 'firefox'].includes(data.browser) && data.mobile === false;
+    },
+    exclusion_message: (data) => {
+      aborted = true;
+          if(data.mobile){
+      return '<p>You must use a desktop/laptop computer to participate in this experiment.</p>';
+    } else if(data.browser !== 'chrome'){
+      return '<p>You must use Chrome or Firefox as your browser to complete this experiment.</p>'
+    }
+    },
+  }
+  ],
+  conditional_function: function(){
+      if(pilot === 'true'){
+        return false;
+      } else {
+        return true;
+      }
+    }}
+
+
+
+// Enter Fullscreen
+
+  var enter_fullscreen = {
+    timeline: [
+    {type: jsPsychFullscreen,
+    message: '<p>To take part in the experiment, your browser must be in fullscreen mode. Exiting fullscreen mode will pause the experiment. <br></br>Please click the button below to enable fullscreen mode and continue.</p>',
+    fullscreen_mode: true,
+    on_finish: function(){
+      in_fullscreen = true;
+    }
+  }
+  ],
+    conditional_function: function(){
+      if(pilot === 'true'){
+        return false;
+      } else {
+        return true;
+      }
+    }
+  }
 
 
 
@@ -461,6 +519,7 @@ const test_block = {
 // Capture any url paramaters
 const PROLIFIC_PID = jsPsych.data.getURLVariable('PROLIFIC_PID');
 const SONA_PID = jsPsych.data.getURLVariable('SONAID');
+const pilot = jsPsych.data.getURLVariable('pilot');
 
 
 // Redirect based on SONA vs Prolific
