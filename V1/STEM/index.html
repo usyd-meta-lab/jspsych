@@ -79,7 +79,7 @@
   var trialnum = 1;
   var blocknum = 1;
   const task_time = 30; // time in minutes for the PIS 
-
+aborted = false;
 
 
 
@@ -290,7 +290,7 @@ var STEM_trial = {
     prompt: jsPsych.timelineVariable('question_text'), 
     name: jsPsych.timelineVariable('item'), 
     options:  jsPsych.timelineVariable('answers_text'), 
-    required: true
+    required: false
   }
   ],
   on_finish: function(data) {
@@ -542,8 +542,8 @@ if(typeof SONA_PID != 'undefined'){
     jsPsych.data.addProperties({participant_id: PROLIFIC_PID});
     jsPsych.data.addProperties({Source: "Prolific"});
 
-    redirect_link ="http://usyd-meta-lab/jspsych/V1/dot-discrimination-main?PROLIFIC_PID" + PROLIFIC_PID;
-    attention_redirect_link ="http://usyd-meta-lab/jspsych/V1/dot-discrimination-main?PROLIFIC_PID" + PROLIFIC_PID; // A seperate link for those who fail the attention check
+    redirect_link ="http://usyd-meta-lab.github.io/jspsych/V1/dot-discrimination-main/?PROLIFIC_PID=" + PROLIFIC_PID;
+    attention_redirect_link ="http://usyd-meta-lab.github.io/jspsych/V1/dot-discrimination-main/?PROLIFIC_PID=" + PROLIFIC_PID;// A seperate link for those who fail the attention check
   }
 
 
