@@ -1,2 +1,0 @@
-# jspsych
-jspsych Server
