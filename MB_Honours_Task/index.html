@@ -641,7 +641,7 @@ const enter_fullscreen = {
  *   - `provide_feedback`: A flag that indicates whether feedback should be provided.
  */
 var dot_trial = {
-    data: function(){
+  data: function(){
     return {trialnum: trialnum, blocknum: blocknum}
   },
   timeline: [
@@ -691,10 +691,12 @@ var dot_trial = {
         // Set up the dot counts.
         const baseline = 313;  // half-filled box (313 dots)
         // Choose a random increment between 1 and 70 scaled by an exponential function of the staircase log value.
-        const increment = Math.round(70 * Math.exp(staircase.current_log - 4.2));
+        const increment = Math.round(Math.exp(staircase.current_log));
         const highCount = baseline + increment;
 
-      // Randomly assign the higher dot count to the left or right box based on timeline (to ensure balance).
+
+
+        // Randomly assign the higher dot count to the left or right box based on timeline (to ensure balance).
         let leftDots, rightDots;
         if(jsPsych.evaluateTimelineVariable('target_left')){
           leftDots = highCount;
@@ -703,6 +705,7 @@ var dot_trial = {
           leftDots = baseline;
           rightDots = highCount;
         }
+
 
         // Determine the correct response key based on which box has more dots.
         let correct_key, target_left;
@@ -759,30 +762,29 @@ var dot_trial = {
       },
       choices: ['w', 'e'],
       prompt: function(){
-
-       var startX = (canvasWidth - 380) / 2;
-       if(phase == "Practice") {return `<p style = "position: absolute; margin-left: ${startX}px; margin-top: 0%;" >Press W if the box on the left had more dots.<br>Press E if the box on the right had more dots.</p>`} else {return ''}
-     },
-     on_finish: function(data) {
-      data.trial_type = "Stimulus Response";
+        var startX = (canvasWidth - 380) / 2;
+        if(phase == "Practice") {return `<p style = "position: absolute; margin-left: ${startX}px; margin-top: 0%;" >Press W if the box on the left had more dots.<br>Press E if the box on the right had more dots.</p>`} else {return ''}
+      },
+      on_finish: function(data) {
+        data.trial_type = "Stimulus Response";
 
         // Score the response accuracy by comparing the key pressed to the correct key.
-      if (data.response == window.current_trial_dots.correct_key) {
-        data.correct = 1;
-      } else {
-        data.correct = 0;
-      }
+        if (data.response == window.current_trial_dots.correct_key) {
+          data.correct = 1;
+        } else {
+          data.correct = 0;
+        }
 
         // Clean up the temporary storage.
-      delete window.current_trial_dots;
-    }
-  },
+        delete window.current_trial_dots;
+      }
+    },
 
     // 5. Response highlight trial (Feedback display)
-  {
-    type: jsPsychCanvasKeyboardResponse,
-    canvas_size: [canvasHeight, canvasWidth],
-    trial_duration: 500,
+    {
+      type: jsPsychCanvasKeyboardResponse,
+      canvas_size: [canvasHeight, canvasWidth],
+      trial_duration: 500,
       /**
        * Provides visual feedback by drawing a blue outline (if no feedback is to be given)
        * or green/red outlines based on the response correctness.
@@ -790,14 +792,14 @@ var dot_trial = {
        * @param {HTMLCanvasElement} c - The canvas element for drawing the feedback.
        * @returns {undefined} Calls drawStimuli to show boxes with highlighted sides.
        */
-    stimulus: function(c) {
+      stimulus: function(c) {
         // Retrieve the last response data.
-      const lastResponse = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last(1).values()[0].response;
-      const lastCorrect = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last(1).values()[0].correct;
-      let feedbackColor;
+        const lastResponse = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last(1).values()[0].response;
+        const lastCorrect = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last(1).values()[0].correct;
+        let feedbackColor;
 
         // Determine the feedback color based on whether feedback is provided and whether the response was correct.
-      if (provide_feedback === false) {
+        if (provide_feedback === false) {
           feedbackColor = "blue"; // Color if no feedback provided
         } else if (provide_feedback === true && lastCorrect === 1) {
           feedbackColor = "green"; // Color for correct response when feedback is provided
@@ -808,7 +810,7 @@ var dot_trial = {
         // Highlight the box based on the response key.
         if (lastResponse === "e") {
           return drawStimuli(c, false, "black", feedbackColor);
-        } else if (lastResponse === "w") {
+        } else if(lastResponse === "w") {
           return drawStimuli(c, false, feedbackColor, "black");
         }
       },
@@ -842,11 +844,10 @@ var dot_trial = {
           css_classes: ["conf_rating"],
           on_load: function() {
 
-                  const wrapper = document.querySelector('.conf_rating');
+            const wrapper = document.querySelector('.conf_rating');
 
               // Reset thumb to hidden at the start of the trial
-              wrapper.style.setProperty('--thumb-visibility', 'hidden');
-
+            wrapper.style.setProperty('--thumb-visibility', 'hidden');
 
 
             // Center the slider by calculating the left margin.
@@ -858,8 +859,7 @@ var dot_trial = {
             document.getElementById("conf4").style.left = marLeft;
             document.getElementById("conf5").style.left = marLeft;
 
-            // Now reveal the thumb when the slider is used
-
+             // Now reveal the thumb when the slider is used
             wrapper.addEventListener('pointerdown', function handleFirstClick() {
               wrapper.style.setProperty('--thumb-visibility', 'visible');
               wrapper.removeEventListener('pointerdown', handleFirstClick);
@@ -888,8 +888,7 @@ var dot_trial = {
        * and logs relevant trial data. The step size decreases with increasing trial numbers.
        */
       func: function() {
-        // Retrieve the last stimulus response trial and current increment
-        const increment = Math.round(70 * Math.exp(staircase.current_log - 4.2));
+        // Retrieve the last stimulus response trial 
         const lastResp = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last(1).values()[0];
         const correct = lastResp.correct;
 
@@ -911,10 +910,11 @@ var dot_trial = {
             staircase.current_log -= step_size;
             staircase.consecutive_correct = 0; // Reset counter.
           }
-        } else if(increment < 312) {
+        } else {
           // Incorrect response: make the task easier.
           staircase.current_log += step_size;
-          staircase.consecutive_correct = 0;
+          if(staircase.current_log > 5.74){staircase.current_log = 5.74}
+            staircase.consecutive_correct = 0;
         }
 
 
