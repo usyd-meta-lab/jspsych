@@ -663,6 +663,85 @@ const enter_fullscreen = {
 
 
 
+var preload = {
+    type: jsPsychPreload,
+    images: [
+  'assets/BF1/BF1_F_20.jpg','assets/BF1/BF1_F_40.jpg','assets/BF1/BF1_F_60.jpg','assets/BF1/BF1_F_80.jpg','assets/BF1/BF1_F_100.jpg',
+  'assets/BF1/BF1_H_20.jpg','assets/BF1/BF1_H_40.jpg','assets/BF1/BF1_H_60.jpg','assets/BF1/BF1_H_80.jpg','assets/BF1/BF1_H_100.jpg',
+
+  'assets/BF2/BF2_F_20.jpg','assets/BF2/BF2_F_40.jpg','assets/BF2/BF2_F_60.jpg','assets/BF2/BF2_F_80.jpg','assets/BF2/BF2_F_100.jpg',
+  'assets/BF2/BF2_H_20.jpg','assets/BF2/BF2_H_40.jpg','assets/BF2/BF2_H_60.jpg','assets/BF2/BF2_H_80.jpg','assets/BF2/BF2_H_100.jpg',
+
+  'assets/BF3/BF3_F_20.jpg','assets/BF3/BF3_F_40.jpg','assets/BF3/BF3_F_60.jpg','assets/BF3/BF3_F_80.jpg','assets/BF3/BF3_F_100.jpg',
+  'assets/BF3/BF3_H_20.jpg','assets/BF3/BF3_H_40.jpg','assets/BF3/BF3_H_60.jpg','assets/BF3/BF3_H_80.jpg','assets/BF3/BF3_H_100.jpg',
+
+  'assets/BF4/BF4_F_20.jpg','assets/BF4/BF4_F_40.jpg','assets/BF4/BF4_F_60.jpg','assets/BF4/BF4_F_80.jpg','assets/BF4/BF4_F_100.jpg',
+  'assets/BF4/BF4_H_20.jpg','assets/BF4/BF4_H_40.jpg','assets/BF4/BF4_H_60.jpg','assets/BF4/BF4_H_80.jpg','assets/BF4/BF4_H_100.jpg',
+
+  'assets/BF5/BF5_F_20.jpg','assets/BF5/BF5_F_40.jpg','assets/BF5/BF5_F_60.jpg','assets/BF5/BF5_F_80.jpg','assets/BF5/BF5_F_100.jpg',
+  'assets/BF5/BF5_H_20.jpg','assets/BF5/BF5_H_40.jpg','assets/BF5/BF5_H_60.jpg','assets/BF5/BF5_H_80.jpg','assets/BF5/BF5_H_100.jpg',
+
+  'assets/BF6/BF6_F_20.jpg','assets/BF6/BF6_F_40.jpg','assets/BF6/BF6_F_60.jpg','assets/BF6/BF6_F_80.jpg','assets/BF6/BF6_F_100.jpg',
+  'assets/BF6/BF6_H_20.jpg','assets/BF6/BF6_H_40.jpg','assets/BF6/BF6_H_60.jpg','assets/BF6/BF6_H_80.jpg','assets/BF6/BF6_H_100.jpg',
+
+  'assets/BM1/BM1_F_20.jpg','assets/BM1/BM1_F_40.jpg','assets/BM1/BM1_F_60.jpg','assets/BM1/BM1_F_80.jpg','assets/BM1/BM1_F_100.jpg',
+  'assets/BM1/BM1_H_20.jpg','assets/BM1/BM1_H_40.jpg','assets/BM1/BM1_H_60.jpg','assets/BM1/BM1_H_80.jpg','assets/BM1/BM1_H_100.jpg',
+
+  'assets/BM2/BM2_F_20.jpg','assets/BM2/BM2_F_40.jpg','assets/BM2/BM2_F_60.jpg','assets/BM2/BM2_F_80.jpg','assets/BM2/BM2_F_100.jpg',
+  'assets/BM2/BM2_H_20.jpg','assets/BM2/BM2_H_40.jpg','assets/BM2/BM2_H_60.jpg','assets/BM2/BM2_H_80.jpg','assets/BM2/BM2_H_100.jpg',
+
+  'assets/BM3/BM3_F_20.jpg','assets/BM3/BM3_F_40.jpg','assets/BM3/BM3_F_60.jpg','assets/BM3/BM3_F_80.jpg','assets/BM3/BM3_F_100.jpg',
+  'assets/BM3/BM3_H_20.jpg','assets/BM3/BM3_H_40.jpg','assets/BM3/BM3_H_60.jpg','assets/BM3/BM3_H_80.jpg','assets/BM3/BM3_H_100.jpg',
+
+  'assets/BM4/BM4_F_20.jpg','assets/BM4/BM4_F_40.jpg','assets/BM4/BM4_F_60.jpg','assets/BM4/BM4_F_80.jpg','assets/BM4/BM4_F_100.jpg',
+  'assets/BM4/BM4_H_20.jpg','assets/BM4/BM4_H_40.jpg','assets/BM4/BM4_H_60.jpg','assets/BM4/BM4_H_80.jpg','assets/BM4/BM4_H_100.jpg',
+
+  'assets/BM5/BM5_F_20.jpg','assets/BM5/BM5_F_40.jpg','assets/BM5/BM5_F_60.jpg','assets/BM5/BM5_F_80.jpg','assets/BM5/BM5_F_100.jpg',
+  'assets/BM5/BM5_H_20.jpg','assets/BM5/BM5_H_40.jpg','assets/BM5/BM5_H_60.jpg','assets/BM5/BM5_H_80.jpg','assets/BM5/BM5_H_100.jpg',
+
+  'assets/BM6/BM6_F_20.jpg','assets/BM6/BM6_F_40.jpg','assets/BM6/BM6_F_60.jpg','assets/BM6/BM6_F_80.jpg','assets/BM6/BM6_F_100.jpg',
+  'assets/BM6/BM6_H_20.jpg','assets/BM6/BM6_H_40.jpg','assets/BM6/BM6_H_60.jpg','assets/BM6/BM6_H_80.jpg','assets/BM6/BM6_H_100.jpg',
+
+  'assets/WM1/WM1_F_20.jpg','assets/WM1/WM1_F_40.jpg','assets/WM1/WM1_F_60.jpg','assets/WM1/WM1_F_80.jpg','assets/WM1/WM1_F_100.jpg',
+  'assets/WM1/WM1_H_20.jpg','assets/WM1/WM1_H_40.jpg','assets/WM1/WM1_H_60.jpg','assets/WM1/WM1_H_80.jpg','assets/WM1/WM1_H_100.jpg',
+
+  'assets/WM2/WM2_F_20.jpg','assets/WM2/WM2_F_40.jpg','assets/WM2/WM2_F_60.jpg','assets/WM2/WM2_F_80.jpg','assets/WM2/WM2_F_100.jpg',
+  'assets/WM2/WM2_H_20.jpg','assets/WM2/WM2_H_40.jpg','assets/WM2/WM2_H_60.jpg','assets/WM2/WM2_H_80.jpg','assets/WM2/WM2_H_100.jpg',
+
+  'assets/WM3/WM3_F_20.jpg','assets/WM3/WM3_F_40.jpg','assets/WM3/WM3_F_60.jpg','assets/WM3/WM3_F_80.jpg','assets/WM3/WM3_F_100.jpg',
+  'assets/WM3/WM3_H_20.jpg','assets/WM3/WM3_H_40.jpg','assets/WM3/WM3_H_60.jpg','assets/WM3/WM3_H_80.jpg','assets/WM3/WM3_H_100.jpg',
+
+  'assets/WM4/WM4_F_20.jpg','assets/WM4/WM4_F_40.jpg','assets/WM4/WM4_F_60.jpg','assets/WM4/WM4_F_80.jpg','assets/WM4/WM4_F_100.jpg',
+  'assets/WM4/WM4_H_20.jpg','assets/WM4/WM4_H_40.jpg','assets/WM4/WM4_H_60.jpg','assets/WM4/WM4_H_80.jpg','assets/WM4/WM4_H_100.jpg',
+
+  'assets/WM5/WM5_F_20.jpg','assets/WM5/WM5_F_40.jpg','assets/WM5/WM5_F_60.jpg','assets/WM5/WM5_F_80.jpg','assets/WM5/WM5_F_100.jpg',
+  'assets/WM5/WM5_H_20.jpg','assets/WM5/WM5_H_40.jpg','assets/WM5/WM5_H_60.jpg','assets/WM5/WM5_H_80.jpg','assets/WM5/WM5_H_100.jpg',
+
+  'assets/WM6/WM6_F_20.jpg','assets/WM6/WM6_F_40.jpg','assets/WM6/WM6_F_60.jpg','assets/WM6/WM6_F_80.jpg','assets/WM6/WM6_F_100.jpg',
+  'assets/WM6/WM6_H_20.jpg','assets/WM6/WM6_H_40.jpg','assets/WM6/WM6_H_60.jpg','assets/WM6/WM6_H_80.jpg','assets/WM6/WM6_H_100.jpg',
+
+  'assets/WF1/WF1_F_20.jpg','assets/WF1/WF1_F_40.jpg','assets/WF1/WF1_F_60.jpg','assets/WF1/WF1_F_80.jpg','assets/WF1/WF1_F_100.jpg',
+  'assets/WF1/WF1_H_20.jpg','assets/WF1/WF1_H_40.jpg','assets/WF1/WF1_H_60.jpg','assets/WF1/WF1_H_80.jpg','assets/WF1/WF1_H_100.jpg',
+
+  'assets/WF2/WF2_F_20.jpg','assets/WF2/WF2_F_40.jpg','assets/WF2/WF2_F_60.jpg','assets/WF2/WF2_F_80.jpg','assets/WF2/WF2_F_100.jpg',
+  'assets/WF2/WF2_H_20.jpg','assets/WF2/WF2_H_40.jpg','assets/WF2/WF2_H_60.jpg','assets/WF2/WF2_H_80.jpg','assets/WF2/WF2_H_100.jpg',
+
+  'assets/WF3/WF3_F_20.jpg','assets/WF3/WF3_F_40.jpg','assets/WF3/WF3_F_60.jpg','assets/WF3/WF3_F_80.jpg','assets/WF3/WF3_F_100.jpg',
+  'assets/WF3/WF3_H_20.jpg','assets/WF3/WF3_H_40.jpg','assets/WF3/WF3_H_60.jpg','assets/WF3/WF3_H_80.jpg','assets/WF3/WF3_H_100.jpg',
+
+  'assets/WF4/WF4_F_20.jpg','assets/WF4/WF4_F_40.jpg','assets/WF4/WF4_F_60.jpg','assets/WF4/WF4_F_80.jpg','assets/WF4/WF4_F_100.jpg',
+  'assets/WF4/WF4_H_20.jpg','assets/WF4/WF4_H_40.jpg','assets/WF4/WF4_H_60.jpg','assets/WF4/WF4_H_80.jpg','assets/WF4/WF4_H_100.jpg',
+
+  'assets/WF5/WF5_F_20.jpg','assets/WF5/WF5_F_40.jpg','assets/WF5/WF5_F_60.jpg','assets/WF5/WF5_F_80.jpg','assets/WF5/WF5_F_100.jpg',
+  'assets/WF5/WF5_H_20.jpg','assets/WF5/WF5_H_40.jpg','assets/WF5/WF5_H_60.jpg','assets/WF5/WF5_H_80.jpg','assets/WF5/WF5_H_100.jpg',
+
+  'assets/WF6/WF6_F_20.jpg','assets/WF6/WF6_F_40.jpg','assets/WF6/WF6_F_60.jpg','assets/WF6/WF6_F_80.jpg','assets/WF6/WF6_F_100.jpg',
+  'assets/WF6/WF6_H_20.jpg','assets/WF6/WF6_H_40.jpg','assets/WF6/WF6_H_60.jpg','assets/WF6/WF6_H_80.jpg','assets/WF6/WF6_H_100.jpg'
+],
+
+    show_detailed_errors: true
+}
+
 
 
 /* 
@@ -734,11 +813,11 @@ var face_trial = {
         const increment = staircase.current_morph;
 
         // Ranodmise race, sex, ID
-        //const characteristics = jsPsych.randomization.sampleWithoutReplacement(["BM", "BF", "WF", "WM"], 1);
-        //const faceID = jsPsych.randomization.sampleWithoutReplacement([1,2,3,4,5,6], 1);
+        const characteristics = jsPsych.randomization.sampleWithoutReplacement(["BM", "BF", "WF", "WM"], 1);
+        const faceID = jsPsych.randomization.sampleWithoutReplacement([1,2,3,4,5,6], 1);
 
-        const characteristics = jsPsych.randomization.sampleWithoutReplacement(["WF", "WF", "WF", "WF"], 1);
-        const faceID = jsPsych.randomization.sampleWithoutReplacement([1], 1);
+        //const characteristics = jsPsych.randomization.sampleWithoutReplacement(["WF", "WF", "WF", "WF"], 1);
+        //const faceID = jsPsych.randomization.sampleWithoutReplacement([1], 1);
 
         // Select emotion
         if(jsPsych.evaluateTimelineVariable('target_happy')){face_emotion = 'H'; correct_key = "h"} else {face_emotion = "F"; correct_key = "f"}
@@ -1446,6 +1525,7 @@ const save_data = {
  */
 const condition_1_timeline = [
   browser_check,
+  preload,
   enter_fullscreen,
   participant_info_paid,  // from info_sheets.js 
   participant_info_SONA,  // from info_sheets.js
@@ -1470,6 +1550,7 @@ const condition_1_timeline = [
 
 const condition_2_timeline = [
   browser_check,
+  preload,
   enter_fullscreen,
   participant_info_paid,  // from info_sheets.js 
   participant_info_SONA,  // from info_sheets.js
