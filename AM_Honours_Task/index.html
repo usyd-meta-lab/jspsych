@@ -20,6 +20,7 @@
   <script src="https://unpkg.com/@jspsych/plugin-external-html@2.1.0"></script>
   <script src="https://unpkg.com/@jspsych/plugin-preload@2.1.0"></script>
   <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@2.1.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@1.1.3"></script>
   <script src="https://unpkg.com/@jspsych/plugin-browser-check@2.1.0"></script>
   <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@2.1.0"></script>
   <script src="https://unpkg.com/@jspsych/plugin-call-function@2.1.0"></script>
@@ -31,6 +32,7 @@
   <!-- Load the global environment and additional scripts -->
   <script src="https://usyd-meta-lab.github.io/files/info_sheets.js"></script>
     <script src="survey.js"></script>
+    <script src="ability_EI.js"></script>
 
 
 
@@ -293,7 +295,7 @@ const face_instructions = {
   pages: [
     `<h2>Welcome to the task!</h2>
          <p class="instructions">In this task, you will judge whether a face is happy or fearful, then rate your confidence in your judgment.</p>
-         <p class="instructions">A black cross will appear first; focus on it. Then a face will flash on the screen. Then, choose whether the face was happpy or fearful.</p>
+         <p class="instructions">A black cross will appear first; focus on it. Then a face will flash on the screen. Then, choose whether the face was happy or fearful.</p>
          <p class="instructions"><strong>Press H</strong> if the face was <strong>happy</strong>, or <strong>F</strong> if the face was <strong>fearful</strong>.</p>
          <p class="instructions">You will then rate your confidence in that judgment using a scale.</p>
     <p class="instructions">Use the entire scale from &apos;Guessing&apos; to &apos;Certain.&apos;</p>`,
@@ -594,7 +596,7 @@ const face_new_block = {
     return [
       `<p class="instructions">Block ${blocknum} of ${total_blocks}.<br><br>
        You can pause for a break now.<br><br>
-       Remember:<br><strong>F</strong> if the face is <strong>happy</strong>,<br>
+       Remember:<br><strong>H</strong> if the face is <strong>happy</strong>,<br>
       <strong>F</strong> if the face is <strong>fearful</strong>.</p>`
     ];
   },
@@ -1530,9 +1532,11 @@ const condition_1_timeline = [
   participant_info_paid,  // from info_sheets.js 
   participant_info_SONA,  // from info_sheets.js
   demographics,           // from info_sheets.js
-  political_survey,
+  personality_survey,
   family_survey,
   friendships_survey,
+  STEM_instructions,
+  STEM_trial,
   instructions,
   practice_block,
   conf_instruc, 
@@ -1555,9 +1559,11 @@ const condition_2_timeline = [
   participant_info_paid,  // from info_sheets.js 
   participant_info_SONA,  // from info_sheets.js
   demographics,           // from info_sheets.js
-  political_survey,
+  personality_survey,
   family_survey,
   friendships_survey,
+  STEM_instructions,
+  STEM_trial,
   face_instructions,
   face_practice_block,
   conf_instruc, 

@@ -7,6 +7,92 @@
 
 
 /**
+ * BIG 5 PERSONALITY 
+ */
+
+// A typical 5-point Likert scale (adjust as needed).
+    var likert_scale = [
+      "1 - Strongly Disagree",
+      "2 - Disagree",
+      "3 - Neutral",
+      "4 - Agree",
+      "5 - Strongly Agree"
+    ];
+
+    // Create the survey-likert trial
+    var personality_survey = {
+      type: jsPsychSurveyLikert,
+      preamble: '<p>Please read each statement carefully and select the response that best describes you.</p>',
+      questions: [
+        {
+          prompt: "1. Feel comfortable around people.",
+          labels: likert_scale, 
+          name: 'Q1', 
+          required: true
+        },
+        {
+          prompt: "2. Make friends Easily.",
+          labels: likert_scale, 
+          name: 'Q2', 
+          required: true
+        },
+        {
+          prompt: "3. Am skilled at handling social situations.",
+          labels: likert_scale, 
+          name: 'Q3', 
+          required: true
+        },
+        {
+          prompt: "4. Am the life of the party.",
+          labels: likert_scale, 
+          name: 'Q4', 
+          required: true
+        },
+        {
+          prompt: "5. Know how to captivate people.",
+          labels: likert_scale, 
+          name: 'Q5', 
+          required: true
+        },
+        {
+          prompt: "6. Make people feel at ease.",
+          labels: likert_scale, 
+          name: 'Q6', 
+          required: true
+        },
+        {
+          prompt: "7. Have little to say .",
+          labels: likert_scale, 
+          name: 'Q7', 
+          required: true
+        },
+        {
+          prompt: "8. Keep in the background .",
+          labels: likert_scale, 
+          name: 'Q8', 
+          required: true
+        },
+        {
+          prompt: "9. Don't like to draw attention to myself .",
+          labels: likert_scale, 
+          name: 'Q6', 
+          required: true
+        },
+        {
+          prompt: "10. Don't talk a lot .",
+          labels: likert_scale, 
+          name: 'Q7', 
+          required: true
+        }
+      ],
+      // You can also customize button labels, for instance:
+      // button_label: 'Submit',
+    };
+
+
+
+
+/**
  * SOCIAL NETWORK SCALE 
  */
 
