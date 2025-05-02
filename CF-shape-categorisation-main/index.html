@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>USYD Metacognition</title>
+  <link rel="icon" type="image/x-icon" href="https://usyd-meta-lab.github.io/favicon-32x32.png">
+
+  <!-- Load jsPsych and dependencies -->
+  <script src="https://unpkg.com/jspsych@7.3.3"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.2/js/foundation.min.js"></script>
+  <link href="https://unpkg.com/jspsych@7.2.3/css/jspsych.css" rel="stylesheet" type="text/css" />
+  <link href="https://unpkg.com/jquery-ui-css@1.11.5/jquery-ui.css" rel="stylesheet" type="text/css" />
+
+  <!-- Load jsPsych plugins -->
+  <script src="https://unpkg.com/@jspsych/plugin-instructions@1.1.3"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-button-response@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-text@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-external-html@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-preload@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-html-slider-response@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-browser-check@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-canvas-keyboard-response@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-call-function@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.2.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-html-form@1.0.0"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.2"></script>
+  <script src="https://unpkg.com/@jspsych/plugin-image-button-response@1.2.0"></script>
+  <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+
+  <!-- Load the global environment and additional scripts -->
+  <script src="https://usyd-meta-lab.github.io/files/info_sheets.js"></script>
+<script src="survey.js"></script>
+
+  <!-- Custom CSS -->
+
+</head>
+
+<body></body>
+
+<script>
+/* ===============================================================
+   GLOBAL SETTINGS & INITIALIZATION
+   =============================================================== */
+
+// Initialize jsPsych with custom callbacks
+  const jsPsych = initJsPsych({
+    on_finish: function(data) {
+    // evaluate performance using summary trial accuracy
+      if (aborted === false) {
+        const meanCorrect = jsPsych.data.get().filter({ trial_type: "Summary Trial" }).select('correct').mean();
+        if (meanCorrect < 0.55) {
+        // If accuracy is too low, redirect to an attention check failure page
+          window.location = attention_redirect_link;
+        } else {
+        // Otherwise, complete the experiment and redirect appropriately
+          window.location = redirect_link;
+        }
+      }
+    }
+  });
+
+/**
+ * Experiment Parameters
+ * ---------------------------------------------------------------
+ * Modify these constants as needed:
+ * - DataPipe_ID:        Destination for saving experiment data.
+ * - SONA/prolific info: Used to set up redirect links.
+ * - Task parameters:    Trial count, block count, confidence ratings, etc.
+ */
+const DataPipe_ID = "vUyxuIvNMDjb";       // DataPipe ID for saving data
+const sona_experiment_id = "NA";           // SONA experiment ID
+const sona_credit_token = "NA";            // SONA credit token
+const Prolific_redirect = "CHGWKNI0";        // Prolific credit redirect code
+const Prolific_failed_check = "C13PIUOF";    // Prolific attention check failure redirect code
+const task_time = 20;                      // Task duration in minutes
+const total_blocks = 6;                    // Total number of blocks for instructions
+
+// Global toggles and counters
+let ratings_on = false;      // Enable/disable confidence ratings
+let trialnum = 1;            // Global trial counter
+let blocknum = 1;            // Global block counter
+let phase = null;            // Current phase ("Training" or "Test")
+
+// Store common properties in the data
+jsPsych.data.addProperties({ ratings_on: ratings_on });
+
+
+/* ===============================================================
+   INSTRUCTIONS
+   =============================================================== */
+
+/**
+ * Main task instructions.
+ * Two versions are provided depending on whether confidence ratings are enabled.
+ */
+const instructions = {
+  type: jsPsychInstructions,
+  pages: function() {
+    if (ratings_on) {
+      // Two pages when confidence ratings are on:
+      return [
+        `<p class="instructions"><strong>Welcome to the task!</strong><br>
+         In this study you will sort shapes into two categories called "blickets" and "daxes". 
+         Each shape is either a "blicket" or a "daxe". Your job is to learn to distinguish between them.
+         There will be 6 training blocks where you will receive feedback after each response. 
+        After training, there will be a test block.</p>`,
+        `<p class="instructions">You will then rate your confidence in each judgment using a scale.
+        Use the entire scale from &apos;Guessing&apos; to &apos;Certain&apos;.</p>`
+      ];
+    } else {
+      // Single-page instructions if no confidence rating is used
+      return [
+        `<p class="instructions"><strong>Welcome to the task!</strong><br>
+         In this study you will sort shapes into two categories called "blickets" and "daxes". 
+         Each shape is either a "blicket" or a "daxe". Your job is to learn to distinguish between them.
+        There will be 6 training blocks with feedback, followed by a test block. When you are ready to begin click Next</p>`
+      ];
+    }
+  },
+  show_clickable_nav: true
+};
+
+/**
+ * Confidence rating instructions.
+ * This timeline only runs if confidence ratings are enabled.
+ */
+const conf_instruc = {
+  timeline: [
+    {
+      type: jsPsychHtmlSliderResponse,
+      css_classes: ["conf_instructions"],
+      stimulus: function() {
+        const header = jsPsych.timelineVariable('header');
+        return `<div id="header" style="position: relative;">${header}</div><br><br>
+          <div id="Iconf1" class="conf_ins" style="height: 25px; width: 154px; margin-top: 2px; margin-left: 15px;"></div>
+          <div id="Iconf2" class="conf_ins" style="height: 25px; width: 154px; margin-top: 2px; margin-left: 169px;"></div>
+          <div id="Iconf3" class="conf_ins" style="height: 25px; width: 154px; margin-top: 2px; margin-left: 323px;"></div>
+          <div id="Iconf4" class="conf_ins" style="height: 25px; width: 154px; margin-top: 2px; margin-left: 477px;"></div>
+        <div id="Iconf5" class="conf_ins" style="height: 25px; width: 154px; margin-top: 2px; margin-left: 631px;"></div>`;
+      },
+      on_load: function() {
+        // Center the slider segments horizontally
+        const w = window.innerWidth;
+        const marLeft = (w - 800) / 2;
+        document.getElementById("Iconf1").style.left = marLeft + "px";
+        document.getElementById("Iconf2").style.left = marLeft + "px";
+        document.getElementById("Iconf3").style.left = marLeft + "px";
+        document.getElementById("Iconf4").style.left = marLeft + "px";
+        document.getElementById("Iconf5").style.left = marLeft + "px";
+
+        // Optionally disable slider movement based on timeline variable 'disable'
+        const elementx = document.getElementById("jspsych-html-slider-response-response");
+        elementx.disabled = jsPsych.timelineVariable('disable');
+      },
+      min: 1,
+      max: 6,
+      step: 1,
+      slider_start: jsPsych.timelineVariable('start'),
+      slider_width: 800,
+      labels: ['Guessing', '', '', '', '', 'Certain'],
+      button_label: "Submit",
+      require_movement: jsPsych.timelineVariable('require')
+    }
+  ],
+  timeline_variables: [
+    {
+      start: 3, 
+      require: true, 
+      disable: false,
+      header: `A rating scale as shown below is used throughout the task. 
+        You will select any point with your mouse.<br>Choose any point on the 
+      scale and click &apos;Submit&apos; to continue.`
+    },
+    {
+      start: 6, 
+      require: false, 
+      disable: true,
+      header: `During the task, if you are <strong>very sure</strong> that you made 
+      the correct judgment, you should respond <strong>&apos;Certain&apos;</strong>.`
+    },
+    {
+      start: 1, 
+      require: false, 
+      disable: true,
+      header: `<p class="instructions">If you are <strong>very unsure</strong>, 
+      you should respond <strong>&apos;Guessing&apos;</strong>.</p>`
+    },
+    {
+      start: 4, 
+      require: true, 
+      disable: false,
+      header: `<p class="instructions">If you are <strong>somewhat sure</strong>, 
+        you should select a rating between these extremes.</p>
+        <p class="instructions">If you understand how to use the entire scale,
+      choose any point and click &apos;Submit&apos; to continue.</p>`
+    }
+  ],
+  // Only run this timeline if confidence ratings are enabled
+  conditional_function: function() {
+    return ratings_on === true;
+  }
+};
+
+/**
+ * Instructions before starting the main (test) block.
+ */
+const test_block_start = {
+  type: jsPsychInstructions,
+  pages: [
+    'You will now complete the test block. There will be 12 test items. <b>Some of them you have seen before, some you have not</b><br>You will no longer receive feedback.'
+  ],
+  show_clickable_nav: true,
+  button_label_next: "Begin",
+  allow_backward: false
+};
+
+
+  /* ===============================================================
+   PRELOAD STIMULI
+   =============================================================== */
+    const preload = {
+    type: jsPsychPreload,
+    images: [
+      // Training stimuli images.
+      'img/training/cat1-item1.png','img/training/cat1-item2.png','img/training/cat1-item3.png',
+      'img/training/cat1-item4.png','img/training/cat1-item5.png','img/training/cat1-item6.png',
+      'img/training/cat2-item7.png','img/training/cat2-item8.png','img/training/cat2-item9.png',
+      'img/training/cat2-item10.png','img/training/cat2-item11.png','img/training/cat2-item12.png',
+      // Test stimuli - unambiguous images.
+      'img/test/cat1-item1-unambiguous.png', 'img/test/cat1-item2-unambiguous.png',
+      'img/test/cat1-item3-unambiguous.png', 'img/test/cat1-item4-unambiguous.png',
+      'img/test/cat1-item5-unambiguous.png', 'img/test/cat1-item6-unambiguous.png',
+      'img/test/cat2-item7-unambiguous.png', 'img/test/cat2-item8-unambiguous.png',
+      'img/test/cat2-item9-unambiguous.png', 'img/test/cat2-item10-unambiguous.png',
+      'img/test/cat2-item11-unambiguous.png', 'img/test/cat2-item12-unambiguous.png',
+      // Test stimuli - ambiguous images.
+      'img/test/cat2-item1-ambiguous.png','img/test/cat2-item2-ambiguous.png',
+      'img/test/cat2-item3-ambiguous.png', 'img/test/cat2-item4-ambiguous.png',
+      'img/test/cat2-item5-ambiguous.png','img/test/cat2-item6-ambiguous.png',
+      'img/test/cat1-item7-ambiguous.png','img/test/cat1-item8-ambiguous.png',
+      'img/test/cat1-item9-ambiguous.png','img/test/cat1-item10-ambiguous.png',
+      'img/test/cat1-item11-ambiguous.png','img/test/cat1-item12-ambiguous.png'
+    ]
+  };
+
+  
+/* ===============================================================
+   COUNTERBALANCING
+   =============================================================== */
+
+// Define response choices and response mapping arrays.
+// These are counterbalanced using jsPsych.randomization.repeat.
+var choices = jsPsych.randomization.repeat(["Blicket", "Daxe"], 1);
+var response_mapping = jsPsych.randomization.repeat(["rule-Nomatch", "rule-match"], 1);
+
+
+/* ===============================================================
+   CATEGORISATION TRIAL PROCEDURE
+   =============================================================== */
+
+/**
+ * Main categorisation trial.
+ * This timeline shows:
+ * 1. The categorisation response (image-button response)
+ * 2. Confidence rating (if enabled)
+ * 3. Feedback (during training only)
+ * 4. A summary trial to store data.
+ */
+const cat_trial = {
+  // Store trial and block counters with each trial's data
+  data: function() {
+    return { trialnum: trialnum, blocknum: blocknum };
+  },
+  timeline: [
+
+    /* 1. Categorisation Response */
+    {
+      type: jsPsychImageButtonResponse,
+      stimulus: jsPsych.timelineVariable('category_stimulus'),
+      choices: choices,
+      stimulus_height: 250,
+      on_finish: function(data) {
+        // Save the text label of the chosen response
+        data.chosen_category = choices[data.response];
+        data.trial_type = "Stimulus Response";
+
+        // Determine which response is mapped as "rule-match"
+        var ruleMatchIndex = response_mapping.indexOf("rule-match");
+        var ruleMatchCategory = choices[ruleMatchIndex];
+
+        // Get the stimulus category (e.g., "rule-match" or "rule-Nomatch")
+        var stimType = jsPsych.timelineVariable('category');
+
+        // Scoring:
+        // - For "rule-match" stimuli, the correct response is ruleMatchCategory.
+        // - For "rule-Nomatch" stimuli, the correct response is any response that is NOT ruleMatchCategory.
+        if (stimType === "rule-match") {
+          data.correct = (data.chosen_category === ruleMatchCategory) ? 1 : 0;
+        } else if (stimType === "rule-Nomatch") {
+          data.correct = (data.chosen_category !== ruleMatchCategory) ? 1 : 0;
+        } else {
+          // Default if stimulus type is unexpected.
+          data.correct = 0;
+        }
+      }
+    },
+
+    /* 2. Confidence Rating (conditional) */
+    {
+      timeline: [
+        {
+          type: jsPsychHtmlSliderResponse,
+          stimulus: `<h3>Rate your confidence:</h3>
+            <div id="conf1" class="conf" style="height:25px; width:154px; margin-top:2px; margin-left:15px;"></div>
+            <div id="conf2" class="conf" style="height:25px; width:154px; margin-top:2px; margin-left:169px;"></div>
+            <div id="conf3" class="conf" style="height:25px; width:154px; margin-top:2px; margin-left:323px;"></div>
+            <div id="conf4" class="conf" style="height:25px; width:154px; margin-top:2px; margin-left:477px;"></div>
+          <div id="conf5" class="conf" style="height:25px; width:154px; margin-top:2px; margin-left:631px;"></div>`,
+          min: 1,
+          max: 6,
+          step: 1,
+          slider_width: 800,
+          require_movement: true,
+          labels: ['Guessing', '', '', '', '', 'Certain'],
+          button_label: "Submit",
+          on_finish: function(data) {
+            data.trial_type = "Confidence Rating";
+          },
+          css_classes: ["conf_rating"],
+          on_load: function() {
+            // Center the slider on the screen
+            const w = window.innerWidth;
+            const marLeft = (w - 800) / 2;
+            document.getElementById("conf1").style.left = marLeft + "px";
+            document.getElementById("conf2").style.left = marLeft + "px";
+            document.getElementById("conf3").style.left = marLeft + "px";
+            document.getElementById("conf4").style.left = marLeft + "px";
+            document.getElementById("conf5").style.left = marLeft + "px";
+          }
+        }
+      ],
+      // Only show confidence ratings when feedback is off and ratings are enabled.
+      conditional_function: function() {
+        return (!provide_feedback && ratings_on);
+      }
+    },
+
+    /* 3. Feedback (training only) */
+    {
+      timeline: [
+        {
+          type: jsPsychHtmlKeyboardResponse,
+          trial_duration: 500,
+          stimulus: function(){
+
+             // Get the stimulus category (e.g., "rule-match" or "rule-Nomatch")
+            var stimType = jsPsych.timelineVariable('category');
+
+            if (stimType === "rule-match"){
+
+            // Determine which response is mapped as "rule-match"
+              var ruleMatchIndex = response_mapping.indexOf("rule-match");
+              var ruleMatchCategory = choices[ruleMatchIndex];
+              return '<img height = "250" src = '+jsPsych.timelineVariable('category_stimulus')+'></img><br>' +
+              "This is a " + ruleMatchCategory;
+
+            } else {
+
+            // Determine which response is mapped as "rule-Nomatch"
+              var ruleNomatchIndex = response_mapping.indexOf("rule-Nomatch");
+              var ruleNoMatchCategory = choices[ruleNomatchIndex];
+              return '<img height = "250" src = '+jsPsych.timelineVariable('category_stimulus')+'></img><br>' +
+              "This is a " + ruleNoMatchCategory;
+
+
+            }
+
+
+            // Retrieve the last categorisation trial to show feedback.
+            const lastTrial = jsPsych.data.get().filter({ trial_type: "Stimulus Response" }).last(1).values()[0];
+            return `<p id="prompt" style="font-size:24px">
+              ${lastTrial.correct === 1 ? 'Correct' : 'Incorrect'}
+            </p>`;
+          },
+          choices: "NO_KEYS",
+          on_finish: function(data) {
+            data.trial_type = "Feedback";
+          }
+        }
+      ],
+      // Only provide feedback in training phase.
+      conditional_function: function() {
+        return provide_feedback;
+      }
+    },
+
+    /* 4. Intermediate Block Break Instructions */
+    {
+      timeline: [
+        {
+          type: jsPsychInstructions,
+          pages: function() {
+            return [
+              `<p class="instructions">Block ${blocknum} of ${total_blocks} complete.<br><br>
+              You can pause for a break now.<br><br></p>`
+            ];
+          },
+          show_clickable_nav: true,
+          on_finish: function() {
+            // Increment block counter after break
+            blocknum++;
+          }
+        }
+      ],
+      // Show the break every 12 trials.
+      conditional_function: function() {
+        return trialnum % 12 === 0;
+      }
+    },
+
+    /* 5. Summary Trial for Data Logging */
+    {
+      type: jsPsychCallFunction,
+      func: function() {
+        // (Empty function – data is logged in on_finish.)
+      },
+      on_finish: function(data) {
+        // Retrieve data from the last categorisation trial.
+        const lastResp = jsPsych.data.get().filter({ trial_type: "Stimulus Response" }).last(1).values()[0];
+        data.rt = lastResp.rt;                   // Reaction time
+        data.phase = phase;                     // "Training" or "Test"
+        data.response = lastResp.response;        // Button index (0 or 1)
+        data.chosen_category = lastResp.chosen_category;  // e.g., "Blicket" or "Daxe"
+        data.correct = lastResp.correct;          // 1 (correct) or 0 (incorrect)
+        data.stimulus = jsPsych.timelineVariable('category_stimulus'); // Stimulus image
+        data.category = jsPsych.timelineVariable('category');          // Stimulus category
+
+        // Save confidence rating if applicable
+        if (!provide_feedback && ratings_on) {
+          const lastConf = jsPsych.data.get().filter({ trial_type: "Confidence Rating" }).last(1).values()[0];
+          data.confidence = lastConf.response;
+          data.feedback = "False";
+        } else {
+          data.feedback = "True";
+        }
+
+        data.trial_type = "Summary Trial";
+
+        // Increment the global trial counter.
+        trialnum++;
+      }
+    }
+  ]
+};
+
+
+/* ===============================================================
+   BLOCKS (PRACTICE & TEST) DEFINITION
+   =============================================================== */
+
+/**
+ * Training Block (Practice)
+ * - Feedback is provided.
+ * - Confidence ratings are available if enabled.
+ * - Timeline items are pre-shuffled using a custom sampling function to ensure that
+ *   no more than two items of the same category occur consecutively.
+ */
+const training_block = {
+  timeline: [cat_trial],
+  repetitions: 6, // The complete set of training items is repeated 6 times.
+  on_timeline_start: function() {
+    provide_feedback = true;
+    phase = "Training";
+  },
+  // Training timeline variables – 12 items with stimulus images and categories.
+  timeline_variables: [
+    { category_stimulus: 'img/training/cat1-item1.png', category: "rule-Nomatch" },
+    { category_stimulus: 'img/training/cat2-item7.png',  category: "rule-match" },
+    { category_stimulus: 'img/training/cat1-item2.png', category: "rule-Nomatch" },
+    { category_stimulus: 'img/training/cat2-item8.png',  category: "rule-match" },
+    { category_stimulus: 'img/training/cat1-item3.png', category: "rule-Nomatch" },
+    { category_stimulus: 'img/training/cat2-item9.png',  category: "rule-match" },
+    { category_stimulus: 'img/training/cat1-item4.png', category: "rule-Nomatch" },
+    { category_stimulus: 'img/training/cat2-item10.png', category: "rule-match" },
+    { category_stimulus: 'img/training/cat1-item5.png', category: "rule-Nomatch" },
+    { category_stimulus: 'img/training/cat2-item11.png', category: "rule-match" },
+    { category_stimulus: 'img/training/cat1-item6.png', category: "rule-Nomatch" },
+    { category_stimulus: 'img/training/cat2-item12.png', category: "rule-match" }
+  ],
+  // Custom sampling function to randomize order with a constraint.
+  sample: {
+    type: 'custom',
+    fn: function(t) {
+      // --- Helper function: Fisher-Yates shuffle ---
+      function shuffleArray(arr) {
+        let array = arr.slice(); // Copy to avoid modifying original.
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+
+      // --- Helper function: Check no more than two same categories in a row ---
+      function checkConstraint(arr) {
+  // Check within the array.
+        for (let i = 2; i < arr.length; i++) {
+          if (arr[i].category === arr[i-1].category && arr[i].category === arr[i-2].category) {
+            return false;
+          }
+        }
+  // Check the boundary between the last two items and the first item.
+        if (arr.length >= 3) {
+          if (arr[arr.length - 1].category === arr[0].category &&
+            arr[arr.length - 2].category === arr[0].category) {
+            return false;
+        }
+      }
+      return true;
+    }
+      // --- Helper function: Repeat shuffling until the constraint is met ---
+    function shuffleWithConstraint(arr, maxAttempts = 1000) {
+      let attempts = 0;
+      let shuffled;
+      do {
+        shuffled = shuffleArray(arr);
+        attempts++;
+        if (attempts > maxAttempts) {
+          console.error("Unable to find a valid ordering after many attempts.");
+          break;
+        }
+      } while (!checkConstraint(shuffled));
+      return shuffled;
+    }
+      // Return the shuffled timeline variables that meet the constraint.
+    return shuffleWithConstraint(t);
+  }
+}
+};
+
+
+/**
+ * Test Block (No Feedback)
+ * - The test block includes:
+ *   • Previously seen items,
+ *   • Unambiguous test items, and
+ *   • Ambiguous test items.
+ * - A custom sampling function orders these items into groups.
+ */
+const test_block = {
+  timeline: [cat_trial],
+  on_timeline_start: function() {
+    provide_feedback = false;
+    phase = "Test";
+  },
+  // Test timeline variables include 36 items:
+  //   - Items 0-11: Previously seen training items.
+  //   - Items 12-23: Unambiguous test items.
+  //   - Items 24-35: Ambiguous test items.
+  timeline_variables: [
+    // Previously seen training items.
+    { category_stimulus: 'img/training/cat1-item1.png', category: "rule-Nomatch", stimulus_type: "seen" },
+    { category_stimulus: 'img/training/cat1-item2.png', category: "rule-Nomatch", stimulus_type: "seen" },
+    { category_stimulus: 'img/training/cat1-item3.png', category: "rule-Nomatch", stimulus_type: "seen" },
+    { category_stimulus: 'img/training/cat1-item4.png', category: "rule-Nomatch", stimulus_type: "seen" },
+    { category_stimulus: 'img/training/cat1-item5.png', category: "rule-Nomatch", stimulus_type: "seen" },
+    { category_stimulus: 'img/training/cat1-item6.png', category: "rule-Nomatch", stimulus_type: "seen" },
+    { category_stimulus: 'img/training/cat2-item7.png', category: "rule-match",  stimulus_type: "seen" },
+    { category_stimulus: 'img/training/cat2-item8.png', category: "rule-match",  stimulus_type: "seen" },
+    { category_stimulus: 'img/training/cat2-item9.png', category: "rule-match",  stimulus_type: "seen" },
+    { category_stimulus: 'img/training/cat2-item10.png', category: "rule-match", stimulus_type: "seen" },
+    { category_stimulus: 'img/training/cat2-item11.png', category: "rule-match", stimulus_type: "seen" },
+    { category_stimulus: 'img/training/cat2-item12.png', category: "rule-match", stimulus_type: "seen" },
+    // Unambiguous test items.
+    { category_stimulus: 'img/test/cat1-item1-unambiguous.png', category: "rule-Nomatch", stimulus_type: "unambiguous" },
+    { category_stimulus: 'img/test/cat1-item2-unambiguous.png', category: "rule-Nomatch", stimulus_type: "unambiguous" },
+    { category_stimulus: 'img/test/cat1-item3-unambiguous.png', category: "rule-Nomatch", stimulus_type: "unambiguous" },
+    { category_stimulus: 'img/test/cat1-item4-unambiguous.png', category: "rule-Nomatch", stimulus_type: "unambiguous" },
+    { category_stimulus: 'img/test/cat1-item5-unambiguous.png', category: "rule-Nomatch", stimulus_type: "unambiguous" },
+    { category_stimulus: 'img/test/cat1-item6-unambiguous.png', category: "rule-Nomatch", stimulus_type: "unambiguous" },
+    { category_stimulus: 'img/test/cat2-item7-unambiguous.png', category: "rule-match",    stimulus_type: "unambiguous" },
+    { category_stimulus: 'img/test/cat2-item8-unambiguous.png', category: "rule-match",    stimulus_type: "unambiguous" },
+    { category_stimulus: 'img/test/cat2-item9-unambiguous.png', category: "rule-match",    stimulus_type: "unambiguous" },
+    { category_stimulus: 'img/test/cat2-item10-unambiguous.png', category: "rule-match",   stimulus_type: "unambiguous" },
+    { category_stimulus: 'img/test/cat2-item11-unambiguous.png', category: "rule-match",   stimulus_type: "unambiguous" },
+    { category_stimulus: 'img/test/cat2-item12-unambiguous.png', category: "rule-match",   stimulus_type: "unambiguous" },
+    // Ambiguous test items.
+    { category_stimulus: 'img/test/cat2-item1-ambiguous.png', category: "rule-match", stimulus_type: "ambiguous" },
+    { category_stimulus: 'img/test/cat2-item2-ambiguous.png', category: "rule-match", stimulus_type: "ambiguous" },
+    { category_stimulus: 'img/test/cat2-item3-ambiguous.png', category: "rule-match", stimulus_type: "ambiguous" },
+    { category_stimulus: 'img/test/cat2-item4-ambiguous.png', category: "rule-match", stimulus_type: "ambiguous" },
+    { category_stimulus: 'img/test/cat2-item5-ambiguous.png', category: "rule-match", stimulus_type: "ambiguous" },
+    { category_stimulus: 'img/test/cat2-item6-ambiguous.png', category: "rule-match", stimulus_type: "ambiguous" },
+    { category_stimulus: 'img/test/cat1-item7-ambiguous.png', category: "rule-Nomatch", stimulus_type: "ambiguous" },
+    { category_stimulus: 'img/test/cat1-item8-ambiguous.png', category: "rule-Nomatch", stimulus_type: "ambiguous" },
+    { category_stimulus: 'img/test/cat1-item9-ambiguous.png', category: "rule-Nomatch", stimulus_type: "ambiguous" },
+    { category_stimulus: 'img/test/cat1-item10-ambiguous.png', category: "rule-Nomatch", stimulus_type: "ambiguous" },
+    { category_stimulus: 'img/test/cat1-item11-ambiguous.png', category: "rule-Nomatch", stimulus_type: "ambiguous" },
+    { category_stimulus: 'img/test/cat1-item12-ambiguous.png', category: "rule-Nomatch", stimulus_type: "ambiguous" }
+  ],
+  // Custom sampling function to order test items.
+  // This function splits indices into groups (seen, unambiguous, ambiguous),
+  // then shuffles and concatenates them to form the final order.
+  sample: {
+    type: 'custom',
+    fn: function(t) {
+      // Split indices for the first 12 seen items into two halves.
+      let first_half = jsPsych.randomization.shuffle([0, 1, 2, 3, 4, 5]);
+      let second_half = jsPsych.randomization.shuffle([6, 7, 8, 9, 10, 11]);
+
+      // Select two seen items from each half.
+      let seen_items = [first_half[0], first_half[1], second_half[0], second_half[1]];
+      // Next four indices (from each half) for unambiguous items.
+      let unambiguous_items = [first_half[2], first_half[3], second_half[2], second_half[3]];
+      // Remaining indices for ambiguous items.
+      let ambiguous_items = [first_half[4], first_half[5], second_half[4], second_half[5]];
+
+      // Adjust indices for test items:
+      // - Unambiguous items come from timeline indices 12–23.
+      // - Ambiguous items come from timeline indices 24–35.
+      unambiguous_items = unambiguous_items.map(num => num + 12);
+      ambiguous_items = ambiguous_items.map(num => num + 24);
+
+      // Concatenate the seen, ambiguous, and unambiguous items.
+      let all_items = seen_items.concat(ambiguous_items, unambiguous_items);
+      // Shuffle the final order.
+      let test_items = jsPsych.randomization.shuffle(all_items);
+      return test_items;
+    }
+  }
+};
+
+
+/* ===============================================================
+   FINAL DEBRIEF & DATA SAVE
+   =============================================================== */
+
+/**
+ * Debug survey: Ask participants if they encountered any issues.
+ */
+const debug = {
+  type: jsPsychSurveyText,
+  questions: [
+    { prompt: 'Did you experience any issues while completing this study?', rows: 5 }
+  ]
+};
+
+// Capture URL parameters (e.g., for Prolific, SONA, pilot)
+const PROLIFIC_PID = jsPsych.data.getURLVariable('PROLIFIC_PID');
+const SONAID       = jsPsych.data.getURLVariable('SONAID');
+const pilot        = jsPsych.data.getURLVariable('pilot');
+
+// Decide redirect links based on source (SONA or Prolific)
+let redirect_link, attention_redirect_link;
+
+if (typeof SONAID !== 'undefined') {
+  // SONA participant
+  jsPsych.data.addProperties({ participant_id: SONAID, Source: "SONA" });
+  redirect_link = `https://sydneypsych.sona-systems.com/webstudy_credit.aspx?experiment_id=${sona_experiment_id}&credit_token=${sona_credit_token}&survey_code=${SONAID}&id=${SONAID}`;
+  attention_redirect_link = `https://sydney.au1.qualtrics.com/jfe/form/SV_3h2qh8pBAnv00QK?SONAID=${SONAID}accuracy=`;
+} else {
+  // Prolific participant
+  jsPsych.data.addProperties({ participant_id: PROLIFIC_PID, Source: "Prolific" });
+  redirect_link = `https://app.prolific.com/submissions/complete?cc=${Prolific_redirect}`;
+  attention_redirect_link = `https://app.prolific.co/submissions/complete?cc=${Prolific_failed_check}`;
+}
+
+// Generate a random subject ID and filename for saving data.
+const subject_id = jsPsych.randomization.randomID(10);
+const filename   = `${subject_id}.csv`;
+
+// Save data using jsPsychPipe (e.g., to OSF or another supported platform)
+const save_data = {
+  type: jsPsychPipe,
+  action: "save",
+  experiment_id: DataPipe_ID,
+  filename: filename,
+  data_string: () => jsPsych.data.get().csv()
+};
+
+
+/* ===============================================================
+   BUILD AND RUN THE EXPERIMENT
+   =============================================================== */
+
+
+
+/**
+ * Full timeline for Condition 1.
+ * (Additional conditions can be created if desired.)
+ */
+const condition_1_timeline = [
+  participant_info_paid,   // from info_sheets.js 
+  participant_info_SONA,   // from info_sheets.js
+  demographics,            // from info_sheets.js
+  socialMediaSurvey,
+  mobilePhoneSurvey,
+  instructions,
+  conf_instruc,    // Confidence instructions (if ratings are on)
+  training_block,  // Practice block with feedback and custom ordering
+  test_block_start, // Instructions to start test
+  test_block,      // Test block with custom sampling
+  debug,           // Debug survey
+  save_data,       // Save experiment data
+  DEBRIEF_SONA     // Debriefing (from info_sheets.js)
+];
+
+
+
+
+/**
+ * Asynchronously fetch a condition (if needed) and then run the timeline.
+ */
+async function createExperiment() {
+  const condition = await jsPsychPipe.getCondition(DataPipe_ID);
+  jsPsych.data.addProperties({ condition: condition });
+  
+  // Run the timeline based on condition (here, both condition 0 and 1 use the same timeline)
+  if (condition == 0 ) {
+    jsPsych.run(condition_1_timeline);
+  } else {
+    // Default fallback
+    jsPsych.run(condition_1_timeline);
+  }
+}
+
+// Start the experiment
+createExperiment();
+</script>
+</html>
