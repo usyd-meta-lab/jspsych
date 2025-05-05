@@ -75,13 +75,13 @@
         {
           prompt: "9. Don't like to draw attention to myself .",
           labels: likert_scale, 
-          name: 'Q6', 
+          name: 'Q9', 
           required: true
         },
         {
           prompt: "10. Don't talk a lot .",
           labels: likert_scale, 
-          name: 'Q7', 
+          name: 'Q10', 
           required: true
         }
       ],
