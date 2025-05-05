@@ -315,7 +315,7 @@ const practice_end = {
   type: jsPsychInstructions,
   pages:  [
     `<p class="instructions">In the real task, you will not see accuracy feedback. Instead, the box you choose will be outlined in <font color="blue">blue</font>.</p>
-    <p class="instructions">You will then be asked to rate your confidence on a scale, which we will explain next.</p>`
+    <p class="instructions">You will then be asked to rate your confidence on a scale.</p>`
   ],
   show_clickable_nav: true
 };
@@ -325,7 +325,7 @@ const face_practice_end = {
   type: jsPsychInstructions,
   pages:  [
     `<p class="instructions">In the real task, you will not see accuracy feedback.</p>
-    <p class="instructions">You will be asked to rate your confidence on a scale, which we will explain next.</p>`
+    <p class="instructions">You will be asked to rate your confidence on a scale.</p>`
   ],
   show_clickable_nav: true
 };
@@ -563,7 +563,7 @@ const face_test_start = {
           You can take short breaks between blocks.</p>
          <p class="instructions">There are no time limits on your responses or on your confidence ratings.</p>
          <p class="instructions"><strong>Press H</strong> if the face was <strong>happy</strong>,
-    or <strong>F</strong> if the face was fearful<strong>right</strong>.</p>`
+    or <strong>F</strong> if the face was <strong>fearful</strong>.</p>`
   ],
   show_clickable_nav: true
 };
@@ -888,6 +888,37 @@ var face_trial = {
 
       }
     },
+
+
+ // 4. Feedback
+   {
+      timeline: [
+       {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: function(){
+          const lastResp = jsPsych.data.get().filter({trial_type: "Stimulus Response"}).last(1).values()[0];
+          const correct = lastResp.correct;
+
+          if(correct){
+              return '<p style = "color: green; font-size: 18pt;">Correct</p>';
+          } else {
+              return '<p style = "color: red; font-size: 18pt;">Wrong</p>';
+          }
+
+      },
+      choices: "NO_KEYS",
+      trial_duration: 500,
+      on_finish: function(data){
+         data.trial_type = "Feedback";
+      }
+      }
+      ],
+      conditional_function: function() {
+        return phase === "Practice";
+      }
+    },
+
+
 
     // 5. Confidence Rating trial (conditional)
     {
