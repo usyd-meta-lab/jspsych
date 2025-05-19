@@ -55,20 +55,35 @@
  * - DataPipe_ID:         The DataPipe ID to which the data will be saved.
  * - SONA/prolific info:  Used for setting up redirect links.
  */
-const DataPipe_ID = "vmuVgxxOMTlT";  // The DataPipe ID for where the data should be stored
+const DataPipe_ID = "Lczwvo2ReIZj";  // The DataPipe ID for where the data should be stored
 const sona_experiment_id = "NA";      // The SONA experiment ID 
 const sona_credit_token = "NA";       // The SONA credit token 
 const Prolific_redirect = "CHGWKNI0"; // The Prolific redirect link (to credit)
 const Prolific_failed_check = "C13PIUOF"; // The Prolific redirect link for failing an attention check
 const task_time = 30; // (minutes) for the PIS
 const accuracy_criterion = .55; // Accuracy cut-off for manual data review
+let condition = null;
 
+
+/**
+ * Asynchronously fetches a 'condition' from DataPipe (if needed),
+ * then runs the corresponding timeline. If you do not use multiple
+ * conditions, you could simply run condition_1_timeline directly.
+ */
+async function createExperiment() {
+   condition = await jsPsychPipe.getCondition(DataPipe_ID);
+  jsPsych.data.addProperties({ condition: condition });
+  console.log(condition)
+
+}
 
 
 
 // Load the global environment and the expeirment
 </script>
 <script src="assets/js/global.js"></script>
+<script src="assets/js/stimuli.js"></script>
+<script src="assets/js/tetris.js"></script>
 <script src="assets/js/experiment.js"></script>
 <script src="assets/js/survey.js"></script>
 <script>
@@ -84,13 +99,13 @@ const accuracy_criterion = .55; // Accuracy cut-off for manual data review
  * Full timeline for Condition 1. 
  * (You can create separate timelines/conditions if desired.)
  */
-const condition_1_timeline = [
-  eff_rating,
+const timeline = [
   browser_check,
   enter_fullscreen,
   participant_info_paid,  // from info_sheets.js 
   participant_info_SONA,  // from info_sheets.js
   demographics,           // from info_sheets.js
+  word_pairs,
   debug,
   save_data,
   DEBRIEF_SONA,
@@ -99,30 +114,15 @@ const condition_1_timeline = [
 
 
 
-/**
- * Asynchronously fetches a 'condition' from DataPipe (if needed),
- * then runs the corresponding timeline. If you do not use multiple
- * conditions, you could simply run condition_1_timeline directly.
- */
-async function createExperiment() {
-  const condition = await jsPsychPipe.getCondition(DataPipe_ID);
-  jsPsych.data.addProperties({ condition: condition });
-
-  // If you have different conditions, you could add them here:
-  if (condition == 0) {
-    jsPsych.run(condition_1_timeline);
-  } else {
-    // Default fallback
-    jsPsych.run(condition_1_timeline);
-  }
-
-
-}
 
 
 
-// Start the experiment
-createExperiment();
+// Start the experiment – but wait until we have the `condition`
+(async () => {
+  await createExperiment();          // fetch condition & add it to the dataset
+  window.initStimuli(condition);     // build presentation & stimuli arrays
+  jsPsych.run(timeline);             // now launch the study
+})();
 
 </script>
 </html>
