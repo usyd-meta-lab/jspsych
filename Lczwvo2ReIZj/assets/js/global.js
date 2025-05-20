@@ -130,7 +130,7 @@ const data_saved = {
   stimulus: '<p>Data saved successfully. Press <strong>Continue</strong> to be redirected back to your recruitment platform.</p>',
   choices: ['Continue'],
   on_load: function(data){
-    jsPsych.data.get().localSave('csv','mydata.csv'); 
+   // jsPsych.data.get().localSave('csv','mydata.csv'); 
   }
 }
 
