@@ -974,6 +974,22 @@ const condition_3_timeline = [
   DEBRIEF_SONA     // Debriefing (from info_sheets.js)
 ];
 
+const condition_4_timeline = [
+  participant_info_paid,   // from info_sheets.js 
+  participant_info_SONA,   // from info_sheets.js
+  demographics,            // from info_sheets.js
+  relational_inst,
+  relational_mindset,
+  instructions,
+  conf_instruc,    // Confidence instructions (if ratings are on)
+  training_block,  // Practice block with feedback and custom ordering
+  test_block_start, // Instructions to start test
+  test_block,      // Test block with custom sampling
+  debug,           // Debug survey
+  save_data,       // Save experiment data
+  DEBRIEF_SONA     // Debriefing (from info_sheets.js)
+];
+
 /**
  * Asynchronously fetch a condition (if needed) and then run the timeline.
  */
@@ -990,6 +1006,9 @@ async function createExperiment() {
   }  else if (condition == 2 ){
     // Default fallback
     jsPsych.run(condition_3_timeline);
+  } else if (condition == 3 ){
+    // Default fallback
+    jsPsych.run(condition_4_timeline);
   }
 }
 

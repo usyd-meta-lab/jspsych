@@ -3,6 +3,7 @@
 
 This experiment uses [jsPsych](https://www.jspsych.org/) to assess metacognitive processes during a categorisation task. Participants are asked to sort shapes into two categories (called **blickets** and **daxes**) and may also rate their confidence in each decision. The experiment includes both training (with feedback) and test blocks (without feedback). The task is described in <a href="https://doi.org/10.3758/s13421-014-0475-1">Little & McDaniel (2015)</a>.
 
+This version of the task has a mindset manipulation prior to the shapes task designed to induce a relational mindset (versus two counterbalanced controls)
 ---
 
 ## Overview
