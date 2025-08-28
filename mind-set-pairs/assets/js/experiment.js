@@ -7,7 +7,7 @@
 
 let sliderVal = null;   // Tracks slider value
 let phase = null;        // Tracks current phase: "Study" or "Test"
-let study_time = 4000;
+let study_time = 8000;
 let tetris_time = 120000;
 let require_quiz_response = false;
 
