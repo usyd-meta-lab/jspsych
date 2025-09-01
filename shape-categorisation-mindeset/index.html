@@ -27,6 +27,7 @@
   <script src="https://unpkg.com/@jspsych/plugin-survey-likert@1.1.2"></script>
   <script src="https://unpkg.com/@jspsych/plugin-image-button-response@1.2.0"></script>
   <script src="https://unpkg.com/@jspsych-contrib/plugin-pipe"></script>
+<script src="https://unpkg.com/@jspsych/plugin-survey-multi-choice@2.1.0"></script>
 
   <!-- Load the global environment and additional scripts -->
   <script src="https://usyd-meta-lab.github.io/files/info_sheets.js"></script>
@@ -871,6 +872,41 @@ const test_block = {
 
 
 /* ===============================================================
+   Survey Questions
+   =============================================================== */
+
+/**
+  */
+
+
+// Category learning strategy questions (multi-choice, 1–7 scales)
+var category_strategy_trial = {
+  type: jsPsychSurveyMultiChoice,
+  randomize_question_order: false,
+  questions: [
+    {
+      name: "learning_strategy",
+      required: true,
+      horizontal: true,
+      options: ["1 (relying solely upon memorization)","2","3","4","5","6","7 (relying solely upon trying to develop a rule)"],
+      prompt: `While you were learning the categories, were you trying to learn the individual items or trying to develop a rule for why items were members of each category?`
+    },
+    {
+      name: "test_strategy",
+      required: true,
+      horizontal: true,
+      options: ["1 relying solely upon physical similarity","2","3","4","5","6","7 relying solely upon a rule"],
+      prompt: `After learning the categories, when you were asked to categorize new, were you basing that on physical similarity to the earlier items, for example, because they had the same shape, or were you using a rule that explained why items were members of each category, regardless of physical similarity?`
+    }
+  ]
+};
+
+
+
+
+
+
+/* ===============================================================
    FINAL DEBRIEF & DATA SAVE
    =============================================================== */
 
@@ -927,6 +963,7 @@ const save_data = {
  * (Additional conditions can be created if desired.)
  */
 const condition_1_timeline = [
+  category_strategy_trial,
   participant_info_paid,   // from info_sheets.js 
   participant_info_SONA,   // from info_sheets.js
   demographics,            // from info_sheets.js
@@ -943,6 +980,7 @@ const condition_1_timeline = [
 ];
 
 const condition_2_timeline = [
+  category_strategy_trial,
   participant_info_paid,   // from info_sheets.js 
   participant_info_SONA,   // from info_sheets.js
   demographics,            // from info_sheets.js
@@ -960,6 +998,7 @@ const condition_2_timeline = [
 
 
 const condition_3_timeline = [
+  category_strategy_trial,
   participant_info_paid,   // from info_sheets.js 
   participant_info_SONA,   // from info_sheets.js
   demographics,            // from info_sheets.js
@@ -976,6 +1015,7 @@ const condition_3_timeline = [
 ];
 
 const condition_4_timeline = [
+  category_strategy_trial,
   participant_info_paid,   // from info_sheets.js 
   participant_info_SONA,   // from info_sheets.js
   demographics,            // from info_sheets.js
